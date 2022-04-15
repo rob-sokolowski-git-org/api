@@ -13,17 +13,22 @@ services:
   pycharm-dev:
     image: robsoko-api:dev
     ports:
-      - "8000:8000"
-    volumes:
-      - /home/rob/code/api:/home/appuser/run
-    working_dir: /home/appuser/run
-    command:
-      python /home/appuser/run/run_api_dev.py
+      - 8000:8000
 
-  api:
+  api-dev:
+    image: robsoko-api:dev
+    ports:
+      - 8000:8000
+    working_dir: /home/appuser/run
+    volumes:
+    - ./:/home/appuser/run
+    command: python run_api_dev.py
+
+  api-gunicorn:
     image: robsoko-api:latest
     ports:
-      - 80:80
+      - 8080:8080
+
 
 networks:
   api-network:

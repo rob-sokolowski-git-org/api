@@ -1,22 +1,10 @@
-from fastapi import FastAPI, Request, APIRouter
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-
 from api.counter import StatefulCounter
+from api.types import PeakResponse, IncrementResponse
+
 
 counter = StatefulCounter()
-counter.increment(amnt=1)
-
-
-from pydantic import BaseModel
-
-
-class IncrementResponse(BaseModel):
-    value_was: int
-    value_is: int
-
-
-class PeakResponse(BaseModel):
-    value: int
 
 
 def counter_router() -> APIRouter:
@@ -27,32 +15,32 @@ def counter_router() -> APIRouter:
         return PeakResponse(value=counter.value)
 
     @router.post("/counter")
-    def increment_value() -> PeakResponse:
+    def increment_value() -> IncrementResponse:
         was = counter.value
         counter.increment()
         is_ = counter.value
         return IncrementResponse(
             value_was=was,
-            value_is=is_
+            value_is=is_,
         )
 
     return router
 
 
 def get_app_instance() -> FastAPI:
-  app = FastAPI()
+    app = FastAPI()
 
-  app.add_middleware(
+    app.add_middleware(
       CORSMiddleware,
       allow_origins=["*"],
       allow_credentials=False,
       allow_methods=["*"],
       allow_headers=["*"],
-  )
+    )
 
-  app.include_router(counter_router())
+    app.include_router(counter_router())
 
-  return app
+    return app
 
 
 app = get_app_instance()
