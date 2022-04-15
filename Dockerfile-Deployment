@@ -1,0 +1,4 @@
+FROM robsoko-api:dev
+
+COPY ./ /home/appuser
+CMD ["sh", "-c", "gunicorn --workers 4 --timeout 3600 --worker-class uvicorn.workers.UvicornWorker -b 0.0.0.0:80 gunicorn:app"]
