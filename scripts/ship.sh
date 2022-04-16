@@ -6,6 +6,9 @@ docker tag \
 
 docker push gcr.io/fir-sandbox-326008/robsoko-api:latest
 
-gcloud run deploy \
+gcloud run deploy robsoko-api \
     --image gcr.io/fir-sandbox-326008/robsoko-api:latest \
-    --platform managed
+    --platform managed \
+    --region us-east4 \
+    --min-instances 0 \
+    --max-instances 1
