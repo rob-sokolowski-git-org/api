@@ -12,6 +12,8 @@ services:
 
   pycharm-dev:
     image: robsoko-api:dev
+    volumes:
+      - $HOME/data:/appuser/workspace/data
     ports:
       - 8000:8000
 

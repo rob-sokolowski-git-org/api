@@ -11,11 +11,11 @@ def counter_router() -> APIRouter:
     router = APIRouter()
 
     @router.get("/counter")
-    def peak_at_value() -> PeakResponse:
+    async def peak_at_value() -> PeakResponse:
         return PeakResponse(value=counter.value)
 
     @router.post("/counter")
-    def increment_value() -> IncrementResponse:
+    async def increment_value() -> IncrementResponse:
         was = counter.value
         counter.increment()
         is_ = counter.value
@@ -25,6 +25,15 @@ def counter_router() -> APIRouter:
         )
 
     return router
+
+
+
+
+def duckdb_router() -> APIRouter:
+    router = APIRouter()
+
+    return router
+
 
 
 def get_app_instance() -> FastAPI:
@@ -39,6 +48,7 @@ def get_app_instance() -> FastAPI:
     )
 
     app.include_router(counter_router())
+    app.include_router(duckdb_router())
 
     return app
 
