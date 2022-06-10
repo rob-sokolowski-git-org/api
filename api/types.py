@@ -8,3 +8,7 @@ class IncrementResponse(BaseModel):
 
 class PeakResponse(BaseModel):
     value: int
+
+
+class DuckDbQueryRequest(BaseModel):
+    query_str: str

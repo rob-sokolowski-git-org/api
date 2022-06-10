@@ -25,4 +25,11 @@ RUN pip install --user --upgrade pip
 RUN pip install --user pip-tools
 RUN pip install --user -r ./requirements.txt
 
+RUN mkdir /home/appuser/data
+
+
+# workaround for pycharm / WSL docker-compose file mounting problem:
+RUN mkdir /home/appuser/data/five-thirty-eight
+COPY /
+
 WORKDIR /home/appuser

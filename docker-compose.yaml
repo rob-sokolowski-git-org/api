@@ -13,7 +13,8 @@ services:
   pycharm-dev:
     image: robsoko-api:dev
     volumes:
-      - $HOME/data:/appuser/workspace/data
+      # Note: There appears to be an issue with the WSL / Docker-compose / PyCharm trio not quite working
+      - /home/rob/data/:/home/appuser/data
     ports:
       - 8000:8000
 
