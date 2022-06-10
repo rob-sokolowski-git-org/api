@@ -1,5 +1,13 @@
+aiohttp[speedups]
+duckdb
 fastapi
 gunicorn
+pandas
+numpy
 pydantic
-requests
 uvicorn[standard]
+
+# dev deps, for now I don't care about image bloat
+pytest
+pytest-mock
+pytest-asyncio
