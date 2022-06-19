@@ -1,6 +1,11 @@
+import random
+
 import duckdb
 import pandas as pd
 import numpy as np
+
+
+import typing as t
 
 
 class DuckCore:
@@ -13,5 +18,37 @@ class DuckCore:
         """
         self._con.execute(query=query_str)
 
+    def execute(self, query_str: str):  # return type intentionally omitted, let DuckDB handle the duck typing..
+        return self._con.execute(query=query_str)
+
     def execute_as_df(self, query_str: str) -> pd.DataFrame:
-        return self._con.execute(query=query_str).df()
+        return self.execute(query_str=query_str).df()
+
+    def execute_as_df_with_meta_data(self, query_str) -> t.Tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Workaround in an attempt to return info-schema data for front-end deserialization purposes
+
+        Steps:
+            1. disguise query as new randomly-named view
+            2. select * from {the new view}
+            3. describe {the new view}
+            4. return Tuple of [step 2, step 3]
+
+        Note: I haven't considered latency of this "view shuffle" at all
+        """
+        view_name = f"tmp_view_{random.randint(0, 10_000)}"
+        view_cmd = f"""
+            CREATE VIEW {view_name} as {query_str}
+        """
+
+        self.execute(query_str=view_cmd)
+        df_data = self.execute_as_df(query_str=query_str)
+        df_metadata = self.execute_as_df(query_str=f"describe {view_name}")
+
+        return df_data, df_metadata
+
+    def query_table(self, table_name: str, limit: int=100) -> pd.DataFrame:
+        query = f"""
+            select * from {table_name} limit {limit}
+        """
+        return self.execute_as_df(query_str=query)

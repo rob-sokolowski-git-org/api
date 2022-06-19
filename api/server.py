@@ -41,14 +41,13 @@ def duckdb_router() -> APIRouter:
 
     @router.post("/duckdb")
     async def execute_query(req: DuckDbQueryRequest) -> DuckDbQueryResponse:
-        tic = time.perf_counter()
-        df: pd.DataFrame = duck_core.execute_as_df(query_str=req.query_str)
-        toc = time.perf_counter()
-        print(f"{toc-tic} secs")
+        df, df_meta = duck_core.execute_as_df_with_meta_data(query_str=req.query_str)
 
         return DuckDbQueryResponse(
-            data=df.to_dict(orient="list")
+            data=df.to_dict(orient="list"),
+            metadata=df_meta.to_dict(orient="list")
         )
+
     return router
 
 
