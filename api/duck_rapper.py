@@ -1,24 +1,35 @@
-import random
-
 import duckdb
 import pandas as pd
-import numpy as np
-
-
+import random
 import typing as t
 
+from api.types import DuckDbQueryResponse, Column
 
-class DuckCore:
+
+class DuckRapper:
+    """https://www.youtube.com/watch?v=6_BGKyAKigs"""
+
     def __init__(self):
         self._con: duckdb.DuckDBPyConnection = duckdb.connect()
 
+    @staticmethod
+    def map_response(df_data: pd.DataFrame, df_metadata: pd.DataFrame) -> DuckDbQueryResponse:
+        data_dict = df_data.to_dict(orient="list")
+        metadata_records = df_metadata.to_dict(orient="records")
+
+        columns = [Column(
+                    name=record["column_name"],
+                    type=record["column_type"],
+                    values=data_dict[record["column_name"]]
+                ) for record in metadata_records]
+
+        return DuckDbQueryResponse(columns=columns)
+
     def import_csv_file(self, path: str, table_name: str):
-        query_str = f"""
-        CREATE TABLE {table_name} AS SELECT * FROM '{path}';
-        """
+        query_str = f"CREATE TABLE {table_name} AS SELECT * FROM '{path}';"
         self._con.execute(query=query_str)
 
-    def execute(self, query_str: str):  # return type intentionally omitted, let DuckDB handle the duck typing..
+    def execute(self, query_str: str):  # return type intentionally omitted, let DuckDB handle the duck typing
         return self._con.execute(query=query_str)
 
     def execute_as_df(self, query_str: str) -> pd.DataFrame:
@@ -40,15 +51,8 @@ class DuckCore:
         view_cmd = f"""
             CREATE VIEW {view_name} as {query_str}
         """
-
         self.execute(query_str=view_cmd)
         df_data = self.execute_as_df(query_str=query_str)
         df_metadata = self.execute_as_df(query_str=f"describe {view_name}")
 
         return df_data, df_metadata
-
-    def query_table(self, table_name: str, limit: int=100) -> pd.DataFrame:
-        query = f"""
-            select * from {table_name} limit {limit}
-        """
-        return self.execute_as_df(query_str=query)
