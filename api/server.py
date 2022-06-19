@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.models import Response
 
 from api.counter import StatefulCounter
-from api.duck_wrapper import DuckRapper
+from api.duck_rapper import DuckRapper
 from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse
 from fastapi.responses import JSONResponse
 
@@ -43,10 +43,7 @@ def duckdb_router() -> APIRouter:
     async def execute_query(req: DuckDbQueryRequest) -> DuckDbQueryResponse:
         df, df_meta = duckdb.execute_as_df_with_meta_data(query_str=req.query_str)
 
-        return DuckDbQueryResponse(
-            data=df.to_dict(orient="list"),
-            metadata=df_meta.to_dict(orient="list")
-        )
+        return duckdb.map_response(df_data=df, df_metadata=df_meta)
 
     return router
 
