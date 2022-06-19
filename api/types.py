@@ -28,4 +28,5 @@ class DuckDbQueryResponse(BaseModel):
     # Another note: After implementing this solution, select * from president_polls went from ~40ms to ~70ms for
     #               a warmed-up approx latency metric. There is not enough info at this time to conclude it's due to
     #               the serialization, as the "columns 'just json string'" format was about 50% greater, in bytes
-    data: t.Dict[str, t.List[t.Union[Decimal, pd.Timestamp, str]]]
+    data:     t.Dict[str, t.List[t.Union[Decimal, pd.Timestamp, str]]]
+    metadata: t.Dict[str, t.List[t.Union[Decimal, pd.Timestamp, str]]]

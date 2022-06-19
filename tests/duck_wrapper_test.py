@@ -37,3 +37,12 @@ def test_execute_as_df(duck_core_preloaded: DuckCore) -> None:
     """
     df = duck_core_preloaded.execute_as_df(query_str=query)
     assert len(df) > 100
+
+
+def test_execute_as_df_with_meta_data(duck_core_preloaded: DuckCore) -> None:
+    query = "select p.population, sample_size, sponsor_candidate, stage from president_polls_historical p"
+    df, df_meta = duck_core_preloaded.execute_as_df_with_meta_data(query_str=query)
+
+    assert len(df) > 100
+    assert "population" in df.columns
+    assert "population" in df_meta["column_name"].tolist()
