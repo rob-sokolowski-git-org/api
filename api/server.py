@@ -8,12 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.models import Response
 
 from api.counter import StatefulCounter
-from api.duck_wrapper import DuckCore
+from api.duck_wrapper import DuckRapper
 from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse
 from fastapi.responses import JSONResponse
 
 counter = StatefulCounter()
-duck_core = DuckCore()
+duckdb = DuckRapper()
 
 
 def counter_router() -> APIRouter:
@@ -41,7 +41,7 @@ def duckdb_router() -> APIRouter:
 
     @router.post("/duckdb")
     async def execute_query(req: DuckDbQueryRequest) -> DuckDbQueryResponse:
-        df, df_meta = duck_core.execute_as_df_with_meta_data(query_str=req.query_str)
+        df, df_meta = duckdb.execute_as_df_with_meta_data(query_str=req.query_str)
 
         return DuckDbQueryResponse(
             data=df.to_dict(orient="list"),
@@ -53,8 +53,8 @@ def duckdb_router() -> APIRouter:
 
 def import_csv_files() -> None:
     """The following are loaded into DuckDB's memory"""
-    duck_core.import_csv_file(path="./data/president_polls.csv", table_name="president_polls", )
-    duck_core.import_csv_file(path="./data/president_polls_historical.csv", table_name="president_polls_historical", )
+    duckdb.import_csv_file(path="./data/president_polls.csv", table_name="president_polls", )
+    duckdb.import_csv_file(path="./data/president_polls_historical.csv", table_name="president_polls_historical", )
 
 
 def get_app_instance() -> FastAPI:
