@@ -12,5 +12,5 @@ gcloud run deploy robsoko-api \
     --region us-east4 \
     --memory 1024Mi \
     --cpu 2 \
-    --min-instances 0 \
+    --min-instances 1 \
     --max-instances 1
