@@ -24,12 +24,18 @@ attrs==21.4.0
     #   pytest
 brotli==1.0.9
     # via aiohttp
+cachetools==5.2.0
+    # via google-auth
 cchardet==2.1.7
     # via aiohttp
+certifi==2022.6.15
+    # via requests
 cffi==1.15.0
     # via pycares
 charset-normalizer==2.0.12
-    # via aiohttp
+    # via
+    #   aiohttp
+    #   requests
 click==8.1.3
     # via uvicorn
 duckdb==0.3.4
@@ -40,6 +46,25 @@ frozenlist==1.3.0
     # via
     #   aiohttp
     #   aiosignal
+google-api-core==2.8.2
+    # via
+    #   google-cloud-core
+    #   google-cloud-storage
+google-auth==2.9.0
+    # via
+    #   google-api-core
+    #   google-cloud-core
+    #   google-cloud-storage
+google-cloud-core==2.3.1
+    # via google-cloud-storage
+google-cloud-storage==2.4.0
+    # via -r ./requirements.in
+google-crc32c==1.3.0
+    # via google-resumable-media
+google-resumable-media==2.3.3
+    # via google-cloud-storage
+googleapis-common-protos==1.56.3
+    # via google-api-core
 gunicorn==20.1.0
     # via -r ./requirements.in
 h11==0.13.0
@@ -49,6 +74,7 @@ httptools==0.4.0
 idna==3.3
     # via
     #   anyio
+    #   requests
     #   yarl
 iniconfig==1.1.1
     # via pytest
@@ -67,8 +93,18 @@ pandas==1.4.2
     # via -r ./requirements.in
 pluggy==1.0.0
     # via pytest
+protobuf==4.21.2
+    # via
+    #   google-api-core
+    #   googleapis-common-protos
 py==1.11.0
     # via pytest
+pyasn1==0.4.8
+    # via
+    #   pyasn1-modules
+    #   rsa
+pyasn1-modules==0.2.8
+    # via google-auth
 pycares==4.1.2
     # via aiodns
 pycparser==2.21
@@ -96,8 +132,16 @@ pytz==2022.1
     # via pandas
 pyyaml==6.0
     # via uvicorn
+requests==2.28.1
+    # via
+    #   google-api-core
+    #   google-cloud-storage
+rsa==4.8
+    # via google-auth
 six==1.16.0
-    # via python-dateutil
+    # via
+    #   google-auth
+    #   python-dateutil
 sniffio==1.2.0
     # via anyio
 starlette==0.19.1
@@ -106,6 +150,8 @@ tomli==2.0.1
     # via pytest
 typing-extensions==4.2.0
     # via pydantic
+urllib3==1.26.10
+    # via requests
 uvicorn[standard]==0.17.6
     # via -r ./requirements.in
 uvloop==0.16.0

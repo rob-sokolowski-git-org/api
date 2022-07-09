@@ -1,11 +1,13 @@
 aiohttp[speedups]
 duckdb
 fastapi
+google-cloud-storage
 gunicorn
 pandas
 numpy
 pydantic
 uvicorn[standard]
+
 
 # dev deps, for now I don't care about image bloat
 pytest

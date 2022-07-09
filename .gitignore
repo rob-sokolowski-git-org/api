@@ -3,4 +3,5 @@
 __pychache__/
 *.pyc
 
-local-dev.env
+.private/
+tests/temp/
