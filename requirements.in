@@ -1,8 +1,7 @@
 aiohttp[speedups]
 duckdb
 fastapi
-# google-cloud-firestore
-google-cloud-storage
+google-cloud-firestore
 gunicorn
 pandas
 numpy
@@ -10,6 +9,14 @@ pydantic
 python-multipart
 uvicorn[standard]
 
+
+# manually pinning versions as I ran into issues when installing google-cloud-firestore, which pulled down some
+# versions of shared grpc/protobuf code, which broke google-cloud-storage.
+google-api-core==2.8.0
+google-auth==2.6.6
+google-cloud-core==2.3.0
+google-cloud-storage==2.3.0
+googleapis-common-protos==1.56.1
 
 # dev deps, for now I don't care about image bloat
 pytest
