@@ -6,6 +6,7 @@ gunicorn
 pandas
 numpy
 pydantic
+python-multipart
 uvicorn[standard]
 
 
