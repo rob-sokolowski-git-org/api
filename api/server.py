@@ -12,8 +12,10 @@ from api.duck_rapper import DuckRapper
 from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse, Pong
 from fastapi.responses import JSONResponse
 
+from env_config import CONFIG
+
 counter = StatefulCounter()
-duckdb = DuckRapper()
+duckdb = DuckRapper(env_config=CONFIG)
 
 
 def health_check_router() -> APIRouter:

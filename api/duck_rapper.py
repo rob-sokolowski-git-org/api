@@ -4,13 +4,19 @@ import random
 import typing as t
 
 from api.types import DuckDbQueryResponse, Column
+from env_config import EnvironmentConfig
 
 
 class DuckRapper:
     """https://www.youtube.com/watch?v=6_BGKyAKigs"""
 
-    def __init__(self):
+    def __init__(self, env_config: EnvironmentConfig):
         self._con: duckdb.DuckDBPyConnection = duckdb.connect()
+        self._bucket_name: str = env_config.bucket_name
+
+    @property
+    def bucket_name(self) -> str:
+        return self._bucket_name
 
     @staticmethod
     def map_response(df_data: pd.DataFrame, df_metadata: pd.DataFrame) -> DuckDbQueryResponse:

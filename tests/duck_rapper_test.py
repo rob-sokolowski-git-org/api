@@ -2,16 +2,17 @@ import pytest
 
 from api.duck_rapper import DuckRapper
 from api.types import DuckDbQueryResponse
+from env_config import CONFIG, EnvironmentConfig
 
 
 @pytest.fixture
 def duckdb() -> DuckRapper:
-    return DuckRapper()
+    return DuckRapper(env_config=CONFIG)
 
 
 @pytest.fixture
 def duckdb_with_preload_data() -> DuckRapper:
-    duckdb = DuckRapper()
+    duckdb = DuckRapper(env_config=CONFIG)
     path: str = "./data/president_polls_historical.csv"
     table_name: str = "president_polls_historical"
     duckdb.import_csv_file(path=path, table_name=table_name)
