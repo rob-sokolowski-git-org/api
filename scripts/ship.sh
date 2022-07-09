@@ -11,10 +11,11 @@ gcloud run deploy robsoko-api \
     --platform managed \
     --region us-east4 \
     --memory 2048Mi \
-    --cpu 1 \
+    --cpu 4 \
     --set-env-vars "ENV_NAME=production" \
     --set-env-vars "BUCKET_NAME=rob-soko-api-production" \
     --set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=./.private/gcloud-runner-production-key.json" \
     --set-env-vars "TEMP_DIR=./temp" \
+    --set-env-vars "FIRESTORE_DUCKDB_REFS_COLLECTION=production-duckdb-refs" \
     --min-instances 0 \
     --max-instances 1
