@@ -8,14 +8,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.models import Response
 
 from api.counter import StatefulCounter
-from api.duck_rapper import DuckRapper
+from api.core import CoreBusinessLogic
 from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse, Pong
 from fastapi.responses import JSONResponse
 
 from env_config import CONFIG
 
 counter = StatefulCounter()
-duckdb = DuckRapper(env_config=CONFIG)
+duckdb = CoreBusinessLogic(env_config=CONFIG)
 
 
 def health_check_router() -> APIRouter:
