@@ -12,7 +12,7 @@ def duckdb() -> DuckRapper:
 @pytest.fixture
 def duckdb_with_preload_data() -> DuckRapper:
     duckdb = DuckRapper()
-    path: str = "../data/president_polls_historical.csv"
+    path: str = "./data/president_polls_historical.csv"
     table_name: str = "president_polls_historical"
     duckdb.import_csv_file(path=path, table_name=table_name)
 
@@ -20,7 +20,7 @@ def duckdb_with_preload_data() -> DuckRapper:
 
 
 def test_import_csv_to_in_memory_table(duckdb) -> None:
-    path: str = "../data/president_polls.csv"
+    path: str = "./data/president_polls.csv"
     table_name: str = "president_polls"
 
     duckdb.import_csv_file(path=path, table_name=table_name)
