@@ -89,7 +89,7 @@ class CoreBusinessLogic:
         """
         self._con.execute(query=query_str)
 
-    def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: TableRef, parquet_key: str) -> TableRefGroup:
+    def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: TableRef) -> TableRefGroup:
         ref_group = TableRefGroup.from_ref(table_ref=table_name)
 
         self.import_csv_file(path=csv_path, table_ref=ref_group.ref)

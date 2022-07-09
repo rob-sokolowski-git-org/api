@@ -87,20 +87,19 @@ def test_map_to_duckdb_response(core_with_preloaded_table: CoreBusinessLogic) ->
 def test_process_new_csv_file_to_gcs_parquet(core: CoreBusinessLogic):
     path = "./data/president_polls_historical.csv"
     table_name: TableRef = "president_polls_historical"
-    parquet_key = f"{table_name}.parquet"
+    expected_parquet_key = f"{table_name}.parquet"
 
     ref_group = core.process_new_csv_file_to_gcs_parquet(
         csv_path=path,
         table_name=table_name,
-        parquet_key=parquet_key,
     )
 
     assert ref_group.ref == table_name
-    assert ref_group.parquet_key == parquet_key
+    assert ref_group.parquet_key == expected_parquet_key
     assert ref_group.bucket_name == core.bucket_name
 
     # We should be able to download the new file, and save it to disk
-    temp_dest_file = f"{TEST_TEMP_DIR}/{parquet_key}.roundtrip"
+    temp_dest_file = f"{TEST_TEMP_DIR}/{ref_group.parquet_key}.roundtrip"
     if exists(temp_dest_file):
         os.remove(temp_dest_file)
 
