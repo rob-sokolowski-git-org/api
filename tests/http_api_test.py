@@ -24,7 +24,11 @@ def test_upload_file(client: TestClient):
     with open(path, 'r') as f:
         r = client.post(
             url,
-            files={"file": (f.name, f, "multipart/form-data")},
+            files={
+                "file": (f.name, f, "multipart/form-data")
+            },
         )
 
         assert r.ok
+
+

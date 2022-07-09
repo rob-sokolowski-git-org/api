@@ -20,7 +20,6 @@ services:
     env_file:
       - .env
 
-
   api-dev:
     image: robsoko-api:dev
     ports:
@@ -29,12 +28,15 @@ services:
     volumes:
     - ./:/home/appuser/run
     command: python run_api_dev.py
+    env_file:
+      - .env
 
   api-gunicorn:
     image: robsoko-api:latest
     ports:
       - 8080:8080
-
+    env_file:
+      - .env
 
 networks:
   api-network:
