@@ -17,6 +17,9 @@ services:
       - /home/rob/data/:/home/appuser/data
     ports:
       - 8000:8000
+#    env_file:
+#      - .env
+
 
   api-dev:
     image: robsoko-api:dev
