@@ -1,21 +1,13 @@
 import random
-
-import pandas as pd
-import time
 import typing as t
-
 
 from fastapi import FastAPI, APIRouter, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.models import Response
-
-
 from api.core import CoreBusinessLogic
-from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse, Pong, TableRef, \
+from api.types import DuckDbQueryRequest, DuckDbQueryResponse, Pong, TableRef, \
     DuckDbProcessCsvFileResponse
-from fastapi.responses import JSONResponse
-
 from env_config import CONFIG
+
 
 duckdb = CoreBusinessLogic(env_config=CONFIG)
 

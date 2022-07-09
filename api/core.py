@@ -12,7 +12,7 @@ from api import object_storage as obj
 class CoreBusinessLogic:
     def __init__(self, env_config: EnvironmentConfig, blob_storage=obj):
         self._con: duckdb.DuckDBPyConnection = duckdb.connect(
-            check_same_thread=False, # TODO: This might be a bad idea..
+            check_same_thread=False, # TODO: This might be a bad idea: https://github.com/rob-sokolowski-git-org/api/issues/12
         )
         self._bucket_name: str = env_config.bucket_name
         self._temp_dir: str = env_config.temp_dir

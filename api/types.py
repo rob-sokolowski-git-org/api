@@ -10,7 +10,6 @@ from env_config import EnvironmentConfig, CONFIG
 
 
 # begin region internal types
-
 # I'm not sure where I want to put these types yet, putting them in core.py introduces cyclic imports
 TableRef = t.NewType("TableRef", str)
 
@@ -34,17 +33,9 @@ class TableRefGroup:
 # end region internal types
 
 
-class IncrementResponse(BaseModel):
-    value_was: int
-    value_is: int
-
-
-class PeakResponse(BaseModel):
-    value: int
-
-
 class Pong(BaseModel):
     message: str = "PONG!"
+
 
 class DuckDbQueryRequest(BaseModel):
     query_str: str
