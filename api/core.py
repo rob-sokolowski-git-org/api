@@ -4,13 +4,36 @@ import random
 import typing as t
 
 from api.types import DuckDbQueryResponse, Column
+from env_config import EnvironmentConfig
+from api import object_storage as obj
 
 
-class DuckRapper:
-    """https://www.youtube.com/watch?v=6_BGKyAKigs"""
-
-    def __init__(self):
+class CoreBusinessLogic:
+    def __init__(self, env_config: EnvironmentConfig, blob_storage=obj):
         self._con: duckdb.DuckDBPyConnection = duckdb.connect()
+        self._bucket_name: str = env_config.bucket_name
+        self._temp_dir: str = env_config.temp_dir
+        self._blob_storage = blob_storage
+
+        self._create_bucket_if_required()
+
+    def _create_bucket_if_required(self):
+        # TODO: Test case for this method
+        try:
+            self._blob_storage.get_bucket(self._bucket_name)
+        except Exception as _:
+            # TODO: Need to implement logging
+            # TODO: Narrowing exception types in obj storage class
+            # TODO: Should this be implied in upload file method? Maybe with a flag?
+            self._blob_storage.create_bucket(self._bucket_name)
+
+    @property
+    def bucket_name(self) -> str:
+        return self._bucket_name
+
+    @property
+    def blob_storage(self):
+        return self._blob_storage
 
     @staticmethod
     def map_response(df_data: pd.DataFrame, df_metadata: pd.DataFrame) -> DuckDbQueryResponse:
@@ -56,3 +79,24 @@ class DuckRapper:
         df_metadata = self.execute_as_df(query_str=f"describe {view_name}")
 
         return df_data, df_metadata
+
+    def export_table_to_parquet(self, table_name: str, parquet_path: str):
+        query_str = f"""
+        COPY (SELECT * FROM {table_name}) TO '{parquet_path}' (FORMAT 'parquet');
+        """
+        self._con.execute(query=query_str)
+
+    def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: str, parquet_key: str):
+        self.import_csv_file(path=csv_path, table_name=table_name)
+        parquet_path = f"{self._temp_dir}/{parquet_key}"
+
+        self.export_table_to_parquet(
+            table_name=table_name,
+            parquet_path=parquet_path
+        )
+
+        self._blob_storage.create_file(
+            path=parquet_path,
+            bucket_name=self.bucket_name,
+            key=parquet_key,
+        )
