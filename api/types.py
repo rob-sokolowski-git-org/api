@@ -34,3 +34,9 @@ class Column(BaseModel):
 
 class DuckDbQueryResponse(BaseModel):
     columns: t.List[Column]
+
+
+class DuckDbProcessCsvFileResponse(BaseModel):
+    temp_csv_path: str
+    bucket_name: str
+    bucket_key: str

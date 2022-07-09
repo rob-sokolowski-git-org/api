@@ -7,14 +7,13 @@ from fastapi import FastAPI, APIRouter, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.models import Response
 
-from api.counter import StatefulCounter
+
 from api.core import CoreBusinessLogic
 from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse, Pong
 from fastapi.responses import JSONResponse
 
 from env_config import CONFIG
 
-counter = StatefulCounter()
 duckdb = CoreBusinessLogic(env_config=CONFIG)
 
 
@@ -24,25 +23,6 @@ def health_check_router() -> APIRouter:
     @router.get("/ping")
     async def ping() -> Pong:
         return Pong()
-
-    return router
-
-def counter_router() -> APIRouter:
-    router = APIRouter()
-
-    @router.get("/counter")
-    async def peak_at_value() -> PeakResponse:
-        return PeakResponse(value=counter.value)
-
-    @router.post("/counter")
-    async def increment_value() -> IncrementResponse:
-        was = counter.value
-        counter.increment()
-        is_ = counter.value
-        return IncrementResponse(
-            value_was=was,
-            value_is=is_,
-        )
 
     return router
 
@@ -89,7 +69,6 @@ def get_app_instance() -> FastAPI:
     )
 
     app.include_router(health_check_router())
-    app.include_router(counter_router())
     app.include_router(duckdb_router())
     app.include_router(file_router())
 

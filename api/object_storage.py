@@ -30,7 +30,7 @@ def list_blobs(bucket_name: str) -> t.List[storage.Blob]:
 
 
 def _delete_bucket(bucket_name: str, force: bool=False):
-    """I wrote this intending use to be limited to testing cleanup. In general I don't want the service
+    """I wrote this intending use to be limited to testing cleanup. In general, I don't want the service
     deleting data (yet)"""
     bucket = _CLIENT.get_bucket(bucket_or_name=bucket_name)
     bucket.delete(force=force)

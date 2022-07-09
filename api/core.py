@@ -4,8 +4,27 @@ import random
 import typing as t
 
 from api.types import DuckDbQueryResponse, Column
-from env_config import EnvironmentConfig
+from env_config import EnvironmentConfig, CONFIG
 from api import object_storage as obj
+from dataclasses import dataclass
+
+
+TableRef = t.NewType("TableRef", str)
+
+
+@dataclass(frozen=True)
+class TableRefGroup:
+    ref: TableRef
+    bucket_name: str
+    parquet_key: str
+
+    @staticmethod
+    def from_ref(table_ref: TableRef, env_config: EnvironmentConfig=CONFIG) -> "TableRefGroup":
+        return TableRefGroup(
+            ref=table_ref,
+            bucket_name=env_config.bucket_name,
+            parquet_key=f"{table_ref}.parquet"
+        )
 
 
 class CoreBusinessLogic:
