@@ -1,6 +1,8 @@
+import os
+
 import pytest
 
-from api.core import CoreBusinessLogic
+from api.core import CoreBusinessLogic, TableRef
 from api.types import DuckDbQueryResponse
 from env_config import CONFIG, EnvironmentConfig
 import time
@@ -18,7 +20,7 @@ def core_with_preloaded_table() -> CoreBusinessLogic:
     duckdb = CoreBusinessLogic(env_config=CONFIG)
     path: str = "./data/president_polls_historical.csv"
     table_name: str = "president_polls_historical"
-    duckdb.import_csv_file(path=path, table_name=table_name)
+    duckdb.import_csv_file(path=path, table_ref=table_name)
 
     return duckdb
 
@@ -41,7 +43,7 @@ def test_import_csv_to_in_memory_table(core: CoreBusinessLogic) -> None:
     path: str = "./data/president_polls.csv"
     table_name: str = "president_polls"
 
-    core.import_csv_file(path=path, table_name=table_name)
+    core.import_csv_file(path=path, table_ref=table_name)
 
     # read back the table by querying it
     df = core.execute_as_df(query_str="select * from president_polls")
@@ -81,27 +83,35 @@ def test_map_to_duckdb_response(core_with_preloaded_table: CoreBusinessLogic) ->
     assert response.columns[2].name == "sponsor_candidate"
     assert response.columns[3].name == "stage"
 
+
 def test_process_new_csv_file_to_gcs_parquet(core: CoreBusinessLogic):
     path = "./data/president_polls_historical.csv"
-    table_name = "president_polls_historical"
-    parquet_key = f"automated-test-{int(time.time())}-president_polls_historical.parquet"
-    dest_file = f"{TEST_TEMP_DIR}/{parquet_key}.roundtrip"
+    table_name: TableRef = "president_polls_historical"
+    parquet_key = f"{table_name}.parquet"
 
-    core.process_new_csv_file_to_gcs_parquet(
+    ref_group = core.process_new_csv_file_to_gcs_parquet(
         csv_path=path,
         table_name=table_name,
         parquet_key=parquet_key,
     )
 
+    assert ref_group.ref == table_name
+    assert ref_group.parquet_key == parquet_key
+    assert ref_group.bucket_name == core.bucket_name
+
     # We should be able to download the new file, and save it to disk
-    assert not exists(dest_file)
+    temp_dest_file = f"{TEST_TEMP_DIR}/{parquet_key}.roundtrip"
+    if exists(temp_dest_file):
+        os.remove(temp_dest_file)
+
+    assert not exists(temp_dest_file)
     core.blob_storage.fetch_file(
-        bucket_name=core.bucket_name,
-        key=parquet_key,
-        dest_path=dest_file,
+        bucket_name=ref_group.bucket_name,
+        key=ref_group.parquet_key,
+        dest_path=temp_dest_file,
     )
-    assert exists(dest_file)
+    assert exists(temp_dest_file)
 
     # We should be able to query the new table
-    df = core.execute_as_df(query_str=f"select * from {table_name }")
+    df = core.execute_as_df(query_str=f"select * from {table_name}")
     assert len(df) > 1

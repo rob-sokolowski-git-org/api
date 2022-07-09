@@ -3,14 +3,17 @@ import pandas as pd
 import random
 import typing as t
 
-from api.types import DuckDbQueryResponse, Column
+from api.types import DuckDbQueryResponse, Column, TableRef, TableRefGroup
 from env_config import EnvironmentConfig
 from api import object_storage as obj
 
 
+
 class CoreBusinessLogic:
     def __init__(self, env_config: EnvironmentConfig, blob_storage=obj):
-        self._con: duckdb.DuckDBPyConnection = duckdb.connect()
+        self._con: duckdb.DuckDBPyConnection = duckdb.connect(
+            check_same_thread=False, # TODO: This might be a bad idea..
+        )
         self._bucket_name: str = env_config.bucket_name
         self._temp_dir: str = env_config.temp_dir
         self._blob_storage = blob_storage
@@ -48,8 +51,8 @@ class CoreBusinessLogic:
 
         return DuckDbQueryResponse(columns=columns)
 
-    def import_csv_file(self, path: str, table_name: str):
-        query_str = f"CREATE TABLE {table_name} AS SELECT * FROM '{path}';"
+    def import_csv_file(self, path: str, table_ref: TableRef):
+        query_str = f"CREATE TABLE {table_ref} AS SELECT * FROM '{path}';"
         self._con.execute(query=query_str)
 
     def execute(self, query_str: str):  # return type intentionally omitted, let DuckDB handle the duck typing
@@ -86,17 +89,21 @@ class CoreBusinessLogic:
         """
         self._con.execute(query=query_str)
 
-    def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: str, parquet_key: str):
-        self.import_csv_file(path=csv_path, table_name=table_name)
-        parquet_path = f"{self._temp_dir}/{parquet_key}"
+    def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: TableRef, parquet_key: str) -> TableRefGroup:
+        ref_group = TableRefGroup.from_ref(table_ref=table_name)
+
+        self.import_csv_file(path=csv_path, table_ref=ref_group.ref)
+        temp_parquet_path = f"{self._temp_dir}/{ref_group.parquet_key}"
 
         self.export_table_to_parquet(
-            table_name=table_name,
-            parquet_path=parquet_path
+            table_name=ref_group.ref,
+            parquet_path=temp_parquet_path
         )
 
         self._blob_storage.create_file(
-            path=parquet_path,
-            bucket_name=self.bucket_name,
-            key=parquet_key,
+            path=temp_parquet_path,
+            bucket_name=ref_group.bucket_name,
+            key=ref_group.parquet_key,
         )
+
+        return ref_group
