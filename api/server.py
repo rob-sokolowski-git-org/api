@@ -3,18 +3,27 @@ import time
 import typing as t
 
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.models import Response
 
 from api.counter import StatefulCounter
 from api.duck_rapper import DuckRapper
-from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse
+from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse, Pong
 from fastapi.responses import JSONResponse
 
 counter = StatefulCounter()
 duckdb = DuckRapper()
 
+
+def health_check_router() -> APIRouter:
+    router = APIRouter()
+
+    @router.get("/ping")
+    async def ping() -> Pong:
+        return Pong()
+
+    return router
 
 def counter_router() -> APIRouter:
     router = APIRouter()
@@ -48,6 +57,18 @@ def duckdb_router() -> APIRouter:
     return router
 
 
+def file_router() -> APIRouter:
+    router = APIRouter()
+
+    @router.post("/files")
+    async def create_file(file: UploadFile = File(...)) -> DuckDbQueryResponse:
+        file_to_save = await file.read()
+        print("Da fuq?")
+
+
+    return router
+
+
 def import_csv_files() -> None:
     """The following are loaded into DuckDB's memory"""
     duckdb.import_csv_file(path="./data/president_polls.csv", table_name="president_polls", )
@@ -65,8 +86,10 @@ def get_app_instance() -> FastAPI:
       allow_headers=["*"],
     )
 
+    app.include_router(health_check_router())
     app.include_router(counter_router())
     app.include_router(duckdb_router())
+    app.include_router(file_router())
 
     return app
 

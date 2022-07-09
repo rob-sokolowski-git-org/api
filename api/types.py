@@ -14,6 +14,9 @@ class PeakResponse(BaseModel):
     value: int
 
 
+class Pong(BaseModel):
+    message: str = "PONG!"
+
 class DuckDbQueryRequest(BaseModel):
     query_str: str
 
