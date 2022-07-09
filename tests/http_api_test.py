@@ -33,7 +33,6 @@ def test_upload_csv_to_duckdb_server(client: TestClient):
     copied_path = f"{TEST_TEMP_DIR}/{table_ref}.csv"
     shutil.copy(original_path, copied_path)
 
-
     with open(copied_path, 'r') as f:
         r = client.post(
             url,
