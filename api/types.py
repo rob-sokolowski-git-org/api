@@ -66,3 +66,13 @@ class DuckDbQueryResponse(BaseModel):
 
 class DuckDbProcessCsvFileResponse(BaseModel):
     ref_group: TableRefGroup
+
+
+class DuckDbTableRefsResponse(BaseModel):
+    """HTTP response to querying a list of table ref ids"""
+    refs: t.List[TableRef]
+
+
+class DuckDbTableRefGroupResponse(BaseModel):
+    """HTTP response for a full ref_gorup, given a ref id"""
+    ref_group: TableRefGroup
