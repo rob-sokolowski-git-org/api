@@ -129,7 +129,7 @@ class CoreBusinessLogic:
             ref_group = TableRefGroup.from_json(f.read())
             return ref_group
 
-    def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: TableRef, parquet_key: str) -> TableRefGroup:
+    def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: TableRef) -> TableRefGroup:
         ref_group = TableRefGroup.from_ref(table_ref=table_name)
 
         self.import_csv_file(path=csv_path, table_ref=ref_group.ref)
@@ -146,4 +146,19 @@ class CoreBusinessLogic:
             key=ref_group.parquet_key,
         )
 
+        self.persist_ref_group(ref_group=ref_group)
+
         return ref_group
+
+    def list_known_table_refs(self) -> t.List[TableRef]:
+        """
+        Ugly workaround for not having this info saved in a DB
+
+        Assume:
+            * we only have table_refs and parquet files
+            * exclude all blobs with `.parquet` suffix
+
+        When this assumption is no longer valid is when I think a proper DB solution is in order
+        """
+        blobs = self.blob_storage.list_blobs(self.bucket_name)
+        return [b.name for b in blobs if not b.name.endswith(".parquet")]

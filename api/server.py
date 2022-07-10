@@ -54,10 +54,7 @@ def duckdb_router() -> APIRouter:
         ref_group = duckdb.process_new_csv_file_to_gcs_parquet(
             csv_path=tmp_path,
             table_name=duckdb_table_ref,
-            parquet_key=f"{duckdb_table_ref}.parquet"
         )
-
-
 
         return DuckDbProcessCsvFileResponse(
             ref_group=ref_group,

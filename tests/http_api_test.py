@@ -26,7 +26,6 @@ def test_ping(client: TestClient):
 
 def test_upload_csv_to_duckdb_server(client: TestClient):
     url = "http://localhost:8000/duckdb/files"
-
     original_path = "./data/president_polls.csv"
 
     # randomly generate table_ref to ensure uniqueness for testing, then copy data to that name
@@ -34,7 +33,6 @@ def test_upload_csv_to_duckdb_server(client: TestClient):
     copied_path = f"{TEST_TEMP_DIR}/{table_ref}.csv"
 
     shutil.copy(original_path, copied_path)
-
 
     with open(copied_path, 'r') as f:
         r = client.post(
