@@ -1,5 +1,7 @@
 FROM robsoko-api:dev
 
+# Since the service writes to its own home directory, we must grant ownership of the data we're about to copy in
+# Mounting a drive during dev implicitly achieves this, which is why we only do this operation in the deployed version
 USER root
 COPY ./ /home/appuser
 RUN chown -R appuser /home/appuser
