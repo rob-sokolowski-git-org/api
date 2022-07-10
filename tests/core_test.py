@@ -1,9 +1,10 @@
 import os
+import random
 
 import pytest
 
 from api.core import CoreBusinessLogic, TableRef
-from api.types import DuckDbQueryResponse
+from api.types import DuckDbQueryResponse, TableRefGroup
 from env_config import CONFIG, EnvironmentConfig
 import time
 from os.path import exists
@@ -115,3 +116,42 @@ def test_process_new_csv_file_to_gcs_parquet(core: CoreBusinessLogic):
     # We should be able to query the new table
     df = core.execute_as_df(query_str=f"select * from {table_name}")
     assert len(df) > 1
+
+
+def test_persist_then_fetch_ref_group(core: CoreBusinessLogic):
+    ref_group = TableRefGroup.from_ref(
+        table_ref=f"automated-test-{random.randint(0, 1_000_000)}",
+        env_config=CONFIG
+    )
+
+    core.persist_ref_group(ref_group=ref_group)
+
+    fetched_ref_group = core.fetch_ref_group_from_storage(
+        ref=ref_group.ref,
+    )
+
+    assert ref_group == fetched_ref_group
+
+
+def test_persist_ref_group_twice_overrides_quietly(core: CoreBusinessLogic):
+    ref_group = TableRefGroup.from_ref(
+        table_ref=f"automated-test-{random.randint(0, 1_000_000)}",
+        env_config=CONFIG
+    )
+
+    core.persist_ref_group(ref_group=ref_group)
+
+    # 2nd time without error implicitly tests the desired behavior for this test
+    core.persist_ref_group(ref_group=ref_group)
+
+
+def test_fetch_non_existent_ref_group_raises(core: CoreBusinessLogic):
+    ref_group = TableRefGroup.from_ref(
+        table_ref=f"non-existent-ref{random.randint(0, 1_000_000)}",
+        env_config=CONFIG
+    )
+
+    with pytest.raises(Exception):
+        _ = core.fetch_ref_group_from_storage(
+            ref=ref_group.ref,
+        )

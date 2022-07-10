@@ -7,6 +7,7 @@ from api.server import app
 from api.types import Pong, DuckDbProcessCsvFileResponse
 import shutil
 
+from env_config import CONFIG
 
 TEST_TEMP_DIR = "./tests/temp"
 
@@ -50,4 +51,5 @@ def test_upload_csv_to_duckdb_server(client: TestClient):
         response = DuckDbProcessCsvFileResponse(**r.json())
 
         assert response.ref_group.ref == table_ref
-
+        assert response.ref_group.parquet_key == f"{table_ref}.parquet"
+        assert response.ref_group.bucket_name == CONFIG.bucket_name

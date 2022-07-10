@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 
 import pandas as pd
 import typing as t
@@ -14,20 +15,18 @@ from env_config import EnvironmentConfig, CONFIG
 # I'm not sure where I want to put these types yet, putting them in core.py introduces cyclic imports
 TableRef = t.NewType("TableRef", str)
 
-
+@dataclass_json
 @dataclass(frozen=True)
 class TableRefGroup:
     ref: TableRef
     bucket_name: str
     parquet_key: str
-    firestore_collection_name: str
 
     @staticmethod
     def from_ref(table_ref: TableRef, env_config: EnvironmentConfig=CONFIG) -> "TableRefGroup":
         return TableRefGroup(
             ref=table_ref,
             bucket_name=env_config.bucket_name,
-            firestore_collection_name=env_config.firestore_duckdb_refs_collection,
             parquet_key=f"{table_ref}.parquet",
         )
 

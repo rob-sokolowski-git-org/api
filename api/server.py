@@ -57,6 +57,8 @@ def duckdb_router() -> APIRouter:
             parquet_key=f"{duckdb_table_ref}.parquet"
         )
 
+
+
         return DuckDbProcessCsvFileResponse(
             ref_group=ref_group,
         )

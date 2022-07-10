@@ -31,6 +31,5 @@ class EnvironmentConfig:
     bucket_name: str = _get_or_fail("BUCKET_NAME")
     google_application_credentials: str = _get_or_fail("GOOGLE_APPLICATION_CREDENTIALS")
     temp_dir: str = _get_or_fail("TEMP_DIR")
-    firestore_duckdb_refs_collection: str = _get_or_fail("FIRESTORE_DUCKDB_REFS_COLLECTION")
 
 CONFIG = EnvironmentConfig()
