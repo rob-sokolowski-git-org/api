@@ -13,19 +13,24 @@ TEST_TEMP_DIR = "./tests/temp"
 
 
 @pytest.fixture(scope="module")
-def client() -> TestClient:
-    return TestClient(app)
+def client():
+    import requests
+    return requests
 
+
+# TARGET_HOST = "http://localhost:8000"  # local dev
+TARGET_HOST = "http://host.docker.internal:8080"  # local gunicorn
+# TARGET_HOST = "https://api.robsoko.tech92383278"
 
 def test_ping(client: TestClient):
-    response = client.get("http://localhost:8000/ping", timeout=1)
+    response = client.get(f"{TARGET_HOST}/ping", timeout=1)
 
     assert response.ok
     assert Pong(**response.json()).message == "PONG!"
 
 
 def test_upload_csv_to_duckdb_server(client: TestClient):
-    url = "http://localhost:8000/duckdb/files"
+    url = f"{TARGET_HOST}/duckdb/files"
     original_path = "./data/president_polls.csv"
 
     # randomly generate table_ref to ensure uniqueness for testing, then copy data to that name
@@ -55,7 +60,7 @@ def test_upload_csv_to_duckdb_server(client: TestClient):
 
 def test_table_ref_endpoints(client: TestClient):
     # beg region setup
-    url = "http://localhost:8000/duckdb/files"
+    url = f"{TARGET_HOST}/duckdb/files"
     original_path = "./data/president_polls.csv"
     table_ref = f"president_polls_{random.randint(0, 1_000_000)}"
     copied_path = f"{TEST_TEMP_DIR}/{table_ref}.csv"
@@ -71,8 +76,8 @@ def test_table_ref_endpoints(client: TestClient):
             },
         )
     # end region setup
-    url_list_refs_endpoint = "http://localhost:8000/duckdb/table_refs"
-    url_fetch_ref_group_endpoint = f"http://localhost:8000/duckdb/table_refs/{table_ref}"
+    url_list_refs_endpoint = f"{TARGET_HOST}/duckdb/table_refs"
+    url_fetch_ref_group_endpoint = f"{TARGET_HOST}/duckdb/table_refs/{table_ref}"
 
     # our newly uploaded table's table_ref appears in the list of table_refs
     r1 = client.get(url_list_refs_endpoint)
