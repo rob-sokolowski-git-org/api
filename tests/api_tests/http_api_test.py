@@ -7,14 +7,12 @@ from api.server import app
 from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse
 import shutil
 
-from env_config import CONFIG
-
 TEST_TEMP_DIR = "./tests/temp"
 
-
+# TODO: When I do the CloudBuild work these should be set via env files
 # TARGET_HOST = "http://localhost:8000"  # local dev
-TARGET_HOST = "http://host.docker.internal:8080"  # local gunicorn
-# TARGET_HOST = "http://api.robsoko.tech"  # production
+# TARGET_HOST = "http://host.docker.internal:8080"  # local gunicorn
+TARGET_HOST = "https://api.robsoko.tech"  # production
 
 
 @pytest.fixture(scope="module")
@@ -39,7 +37,7 @@ def test_upload_csv_to_duckdb_server(client: TestClient):
     original_path = "./data/president_polls.csv"
 
     # randomly generate table_ref to ensure uniqueness for testing, then copy data to that name
-    table_ref = f"president_polls_{random.randint(0, 1_000_000)}"
+    table_ref = f"automated_test_president_polls_{random.randint(0, 1_000_000)}"
     copied_path = f"{TEST_TEMP_DIR}/{table_ref}.csv"
 
     shutil.copy(original_path, copied_path)
@@ -60,14 +58,16 @@ def test_upload_csv_to_duckdb_server(client: TestClient):
 
         assert response.ref_group.ref == table_ref
         assert response.ref_group.parquet_key == f"{table_ref}.parquet"
-        assert response.ref_group.bucket_name == CONFIG.bucket_name
+
+        # TODO: Once Cloud Build envs are implemented, this assert must vary according to env
+        # assert response.ref_group.bucket_name == CONFIG.bucket_name
 
 
 def test_table_ref_endpoints(client: TestClient):
     # beg region setup
     url = f"{TARGET_HOST}/duckdb/files"
     original_path = "./data/president_polls.csv"
-    table_ref = f"president_polls_{random.randint(0, 1_000_000)}"
+    table_ref = f"automated_test_president_polls_{random.randint(0, 1_000_000)}"
     copied_path = f"{TEST_TEMP_DIR}/{table_ref}.csv"
     shutil.copy(original_path, copied_path)
     with open(copied_path, 'r') as f:
