@@ -29,9 +29,11 @@ def client():
     returns a requests-module-like object.. sometimes dynamic typing is pretty cool!
     """
     if TARGET_HOST == "http://localhost:8000":
+        # load app, wrap it in a requests-module-like TestClient object
         from api.server import app
         return TestClient(app)
     else:
+        # target is external, use standard requests module for tests
         import requests
         return requests
 
