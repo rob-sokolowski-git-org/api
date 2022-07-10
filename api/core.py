@@ -89,6 +89,46 @@ class CoreBusinessLogic:
         """
         self._con.execute(query=query_str)
 
+    def persist_ref_group(self, ref_group: TableRefGroup):
+        """
+        persists ref_group metadata to blob storage
+
+        this is not intended for long term use, CockroachDB seems like the best
+        pricing model for a hobbyist-tier relational DB
+
+        https://github.com/rob-sokolowski-git-org/api/issues/16
+        """
+        temp_path = f"{self._temp_dir}/{ref_group.ref}.json"
+        with open(temp_path, 'w') as f:
+            f.write(ref_group.to_json())
+
+        self._blob_storage.create_file(
+            path=temp_path,
+            bucket_name=self.bucket_name,
+            key=ref_group.ref,
+        )
+
+    def fetch_ref_group_from_storage(self, ref: TableRef) -> TableRefGroup:
+        """
+        fetches ref_group, where `TableRef` is the blob key from blob storage
+
+        this is not intended for long term use, CockroachDB seems like the best
+        pricing model for a hobbyist-tier relational DB
+
+        https://github.com/rob-sokolowski-git-org/api/issues/16
+        """
+        temp_dest_path = f"{self._temp_dir}/{ref}.json"
+
+        self.blob_storage.fetch_file(
+            bucket_name=self.bucket_name,
+            key=ref,
+            dest_path=temp_dest_path,
+        )
+
+        with open(temp_dest_path, 'r') as f:
+            ref_group = TableRefGroup.from_json(f.read())
+            return ref_group
+
     def process_new_csv_file_to_gcs_parquet(self, csv_path: str, table_name: TableRef, parquet_key: str) -> TableRefGroup:
         ref_group = TableRefGroup.from_ref(table_ref=table_name)
 
