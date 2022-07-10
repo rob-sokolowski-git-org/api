@@ -1,11 +1,9 @@
 import random
-
 import pytest
-from fastapi.testclient import TestClient
-
-from api.server import app
-from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse
 import shutil
+
+from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse
+from fastapi.testclient import TestClient
 
 TEST_TEMP_DIR = "./tests/temp"
 
@@ -17,10 +15,24 @@ TARGET_HOST = "https://api.robsoko.tech"  # production
 
 @pytest.fixture(scope="module")
 def client():
+    """
+    This fixture is funky, but useful
+
+    If you wish to run these api tests and also debug the service in a debugger, set
+    TARGET_HOST to localhost. This will return a TestClient which mimcs the `request`
+    modules API, to communicate with an in-memory instance of the service.
+
+    To run these tests against production, or a separate container already running locally, just
+    specify a non localhost url (without trailing /).
+
+    returns a requests-module-like object.. sometimes dynamic typing is pretty cool!
+    """
     if TARGET_HOST == "http://localhost:8000":
+        # load app, wrap it in a requests-module-like TestClient object
+        from api.server import app
         return TestClient(app)
     else:
-        # TODO: Notes on why, this is funky shit
+        # target is external, use standard requests module for tests
         import requests
         return requests
 
