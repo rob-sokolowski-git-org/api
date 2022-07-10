@@ -12,15 +12,20 @@ from env_config import CONFIG
 TEST_TEMP_DIR = "./tests/temp"
 
 
-@pytest.fixture(scope="module")
-def client():
-    import requests
-    return requests
-
-
 # TARGET_HOST = "http://localhost:8000"  # local dev
 TARGET_HOST = "http://host.docker.internal:8080"  # local gunicorn
-# TARGET_HOST = "https://api.robsoko.tech92383278"
+# TARGET_HOST = "http://api.robsoko.tech"  # production
+
+
+@pytest.fixture(scope="module")
+def client():
+    if TARGET_HOST == "http://localhost:8000":
+        return TestClient(app)
+    else:
+        # TODO: Notes on why, this is funky shit
+        import requests
+        return requests
+
 
 def test_ping(client: TestClient):
     response = client.get(f"{TARGET_HOST}/ping", timeout=1)
