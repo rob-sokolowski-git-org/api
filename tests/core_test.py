@@ -93,7 +93,6 @@ def test_process_new_csv_file_to_gcs_parquet(core: CoreBusinessLogic):
     ref_group = core.process_new_csv_file_to_gcs_parquet(
         csv_path=path,
         table_name=table_name,
-        parquet_key=parquet_key,
     )
 
     assert ref_group.ref == table_name
@@ -116,6 +115,9 @@ def test_process_new_csv_file_to_gcs_parquet(core: CoreBusinessLogic):
     # We should be able to query the new table
     df = core.execute_as_df(query_str=f"select * from {table_name}")
     assert len(df) > 1
+
+    # ref_group should've been cataloged to blob storage, this ensures we've saved metadata to GCS
+    assert table_name in core.list_known_table_refs()
 
 
 def test_persist_then_fetch_ref_group(core: CoreBusinessLogic):
@@ -155,3 +157,25 @@ def test_fetch_non_existent_ref_group_raises(core: CoreBusinessLogic):
         _ = core.fetch_ref_group_from_storage(
             ref=ref_group.ref,
         )
+
+def test_list_known_table_refs(core: CoreBusinessLogic):
+    """
+    crappy test that uses implementation detail a bit too much
+
+    this shouldn't be an issue with a DB: https://github.com/rob-sokolowski-git-org/api/issues/16
+    """
+    # setup, this is tested elsewhere
+    path = "./data/president_polls_historical.csv"
+    table_name: TableRef = f"automated_test_president_polls_historical_{random.randint(0, 1_000_000)}"
+
+    # this has the side-effect of writing to gcs, which is what we're testing below
+    _ = core.process_new_csv_file_to_gcs_parquet(
+        csv_path=path,
+        table_name=table_name,
+    )
+
+    # list should exclude parquet files, and we should see the table_ref we created above
+    refs = core.list_known_table_refs()
+
+    # NB: There may be other stuff in this bucket since tests use them, so check the list
+    assert table_name in refs
