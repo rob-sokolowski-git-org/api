@@ -5,7 +5,6 @@ import shutil
 from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse
 from fastapi.testclient import TestClient
 
-
 TEST_TEMP_DIR = "./tests/temp"
 
 # TODO: When I do the CloudBuild work these should be set via env files
