@@ -9,9 +9,9 @@ from fastapi.testclient import TestClient
 TEST_TEMP_DIR = "./tests/temp"
 
 # TODO: When I do the CloudBuild work these should be set via env files
-TARGET_HOST = "http://localhost:8000"  # local dev
+# TARGET_HOST = "http://localhost:8000"  # local dev
 # TARGET_HOST = "http://host.docker.internal:8080"  # local gunicorn
-# TARGET_HOST = "https://api.robsoko.tech"  # production
+TARGET_HOST = "https://api.robsoko.tech"  # production
 
 
 @pytest.fixture(scope="module")
