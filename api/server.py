@@ -35,7 +35,11 @@ def duckdb_router() -> APIRouter:
 
     @router.post("/duckdb")
     async def execute_query(req: DuckDbQueryRequest) -> DuckDbQueryResponse:
-        df, df_meta = core.execute_as_df_with_meta_data(query_str=req.query_str)
+        df, df_meta = core.execute_as_df_with_meta_data(
+            query_str=req.query_str,
+            allow_blob_fallback=req.allow_blob_fallback,
+            fallback_tables=req.fallback_table_refs,
+        )
 
         return core.map_response(df_data=df, df_metadata=df_meta)
 
