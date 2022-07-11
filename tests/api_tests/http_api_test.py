@@ -2,7 +2,8 @@ import random
 import pytest
 import shutil
 
-from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse
+from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse, \
+    DuckDbQueryRequest, DuckDbQueryResponse
 from fastapi.testclient import TestClient
 
 TEST_TEMP_DIR = "./tests/temp"
@@ -105,3 +106,41 @@ def test_table_ref_endpoints(client: TestClient):
     r2 = client.get(url_fetch_ref_group_endpoint)
     ref_group_response = DuckDbTableRefGroupResponse(**r2.json())
     assert ref_group_response.ref_group.ref == table_ref
+
+
+def test_dubckdb_query(client: TestClient):
+    # begin region test setup
+    file_upload_url = f"{TARGET_HOST}/duckdb/files"
+    original_path = "./data/president_polls.csv"
+
+    # randomly generate table_ref to ensure uniqueness for testing, then copy data to that name
+    table_ref = f"automated_test_president_polls_{random.randint(0, 1_000_000)}"
+    copied_path = f"{TEST_TEMP_DIR}/{table_ref}.csv"
+    shutil.copy(original_path, copied_path)
+
+    with open(copied_path, 'r') as f:
+        r = client.post(
+            file_upload_url,
+            data={
+                "duckdb_table_ref": table_ref
+            },
+            files={
+                "file": (f.name, f, "multipart/form-data"),
+            },
+        )
+    # begin region test setup
+    query_duckdb_url = f"{TARGET_HOST}/duckdb"
+
+    r = client.post(
+        query_duckdb_url,
+        json=DuckDbQueryRequest(
+            query_str = f"select * from {table_ref}",
+            fallback_table_refs=[table_ref],
+            allow_blob_fallback=True,
+        ).dict()
+    )
+
+    assert r.ok
+    # deserialize to expected response type
+    resp = DuckDbQueryResponse(**r.json())
+    assert len(resp.columns) > 0

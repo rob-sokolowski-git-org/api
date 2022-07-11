@@ -45,8 +45,11 @@ class PeakResponse(BaseModel):
 class Pong(BaseModel):
     message: str = "PONG!"
 
+
 class DuckDbQueryRequest(BaseModel):
     query_str: str
+    fallback_table_refs: t.List[TableRef]
+    allow_blob_fallback: bool
 
 
 class Column(BaseModel):
