@@ -164,7 +164,26 @@ def test_list_known_table_refs(core: CoreBusinessLogic):
 
     this shouldn't be an issue with a DB: https://github.com/rob-sokolowski-git-org/api/issues/16
     """
-    # setup, this is tested elsewhere
+    # begin region test setup
+    path = "./data/president_polls_historical.csv"
+    table_name: TableRef = f"automated_test_president_polls_historical_{random.randint(0, 1_000_000)}"
+
+    # this has the side-effect of writing to gcs, which is what we're testing below
+    _ = core.process_new_csv_file_to_gcs_parquet(
+        csv_path=path,
+        table_name=table_name,
+    )
+    # end region test setup
+
+    # list should exclude parquet files, and we should see the table_ref we created above
+    refs = core.list_known_table_refs()
+
+    # NB: There may be other stuff in this bucket since tests use them, so check the list
+    assert table_name in refs
+
+
+def test_import_remote_parquet_to_memory(core: CoreBusinessLogic):
+    # begin region test setup
     path = "./data/president_polls_historical.csv"
     table_name: TableRef = f"automated_test_president_polls_historical_{random.randint(0, 1_000_000)}"
 
@@ -174,8 +193,21 @@ def test_list_known_table_refs(core: CoreBusinessLogic):
         table_name=table_name,
     )
 
-    # list should exclude parquet files, and we should see the table_ref we created above
-    refs = core.list_known_table_refs()
+    core.execute(query_str=f"DROP TABLE table_name")
 
-    # NB: There may be other stuff in this bucket since tests use them, so check the list
-    assert table_name in refs
+    # end region test setup
+
+    test_query = f"select * from {table_name}"
+    # we shouldn't be able to query the table
+    with pytest.raises(Exception):
+        # table has been dropped, we cannot query it, but its .parquet file is still in our blob bucket
+        _ = core.execute_as_df(query_str=test_query)
+
+    core.import_remote_parquet_to_memory(
+        table_ref=table_name
+    )
+
+    # we should how be able to query the table
+    df = core.execute_as_df(query_str=test_query)
+
+    assert len(df) > 10

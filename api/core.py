@@ -61,9 +61,31 @@ class CoreBusinessLogic:
     def execute_as_df(self, query_str: str) -> pd.DataFrame:
         return self.execute(query_str=query_str).df()
 
-    def execute_as_df_with_meta_data(self, query_str) -> t.Tuple[pd.DataFrame, pd.DataFrame]:
+    def import_remote_parquet_to_memory(self, table_ref: TableRef):
+        parquet_key = f"{table_ref}.parquet"
+        temp_dest_path = f"{self._temp_dir}/{random.randint(0, 1_000_000)}.parquet"
+
+        self.blob_storage.fetch_file(
+            bucket_name=self.bucket_name,
+            key=parquet_key,
+            dest_path=temp_dest_path
+        )
+
+        import_query_str = f"""
+        CREATE TABLE {table_ref} as SELECT * FROM '{temp_dest_path}'
+        """
+        self.execute(query_str=import_query_str)
+
+
+    def execute_as_df_with_meta_data(self,
+                                     query_str: str,
+                                     allow_blob_fallback: bool,
+                                     fallback_tables: t.List[TableRef]
+                                     ) -> t.Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Workaround in an attempt to return info-schema data for front-end deserialization purposes
+
+        TODO: notes on fallback strategy
 
         Steps:
             1. disguise query as new randomly-named view
@@ -73,15 +95,29 @@ class CoreBusinessLogic:
 
         Note: I haven't considered latency of this "view shuffle" at all
         """
-        view_name = f"tmp_view_{random.randint(0, 10_000)}"
-        view_cmd = f"""
-            CREATE VIEW {view_name} as {query_str}
-        """
-        self.execute(query_str=view_cmd)
-        df_data = self.execute_as_df(query_str=query_str)
-        df_metadata = self.execute_as_df(query_str=f"describe {view_name}")
 
-        return df_data, df_metadata
+        try:
+            view_name = f"tmp_view_{random.randint(0, 10_000)}"
+            view_cmd = f"""
+                CREATE VIEW {view_name} as {query_str}
+            """
+            self.execute(query_str=view_cmd)
+            df_data = self.execute_as_df(query_str=query_str)
+            df_metadata = self.execute_as_df(query_str=f"describe {view_name}")
+            return df_data, df_metadata
+        except Exception as ex:
+            if allow_blob_fallback is True:
+                for table_ref in fallback_tables:
+                    # TODO: a likely worthwhile async optimization possible here! https://github.com/rob-sokolowski-git-org/api/issues/13
+                    self.import_remote_parquet_to_memory(parquet_key=f"{table_ref}.parquet")
+
+                # Call this function again, this time without allowing fallback
+                self.execute_as_df_with_meta_data(
+                    query_str=query_str,
+                    fallback_tables=[],
+                    allow_blob_fallback=False)
+            else:
+                raise ex
 
     def export_table_to_parquet(self, table_name: str, parquet_path: str):
         query_str = f"""
