@@ -9,7 +9,7 @@ import time
 from os.path import exists
 
 
-# NB: Any file will do, we just did *a* file
+# NB: Any file will do, we just need a file
 TEST_FILE_PATH = "./data/president_polls.csv"
 TEST_TEMP_DIR = "./tests/temp"
 
