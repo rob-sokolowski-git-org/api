@@ -1,5 +1,6 @@
 import duckdb
 import pandas as pd
+import numpy as np
 import random
 import typing as t
 
@@ -52,14 +53,17 @@ class CoreBusinessLogic:
         return DuckDbQueryResponse(columns=columns)
 
     def import_csv_file(self, path: str, table_ref: TableRef):
-        query_str = f"CREATE TABLE {table_ref} AS SELECT * FROM '{path}';"
+        query_str = f"CREATE TABLE {table_ref} AS SELECT * FROM read_csv_auto('{path}', auto_detect=True, all_varchar=True);"
         self._con.execute(query=query_str)
 
     def execute(self, query_str: str):  # return type intentionally omitted, let DuckDB handle the duck typing
         return self._con.execute(query=query_str)
 
     def execute_as_df(self, query_str: str) -> pd.DataFrame:
-        return self.execute(query_str=query_str).df()
+        e = self.execute(query_str=query_str)
+        df: pd.DataFrame = e.df()
+        df.replace({np.nan: ""}, inplace=True)
+        return df
 
     def import_remote_parquet_to_memory(self, table_ref: TableRef):
         parquet_key = f"{table_ref}.parquet"
@@ -68,7 +72,7 @@ class CoreBusinessLogic:
         self.blob_storage.fetch_file(
             bucket_name=self.bucket_name,
             key=parquet_key,
-            dest_path=temp_dest_path
+            dest_path=temp_dest_path,
         )
 
         import_query_str = f"""

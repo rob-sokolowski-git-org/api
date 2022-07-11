@@ -58,9 +58,17 @@ class Column(BaseModel):
     #
     # Counterpoint: Zip codes with leading zeros won't work with this solution
     #               but custom typing in BaseModel might be manageable, when needed
+    #
+    #
+    #    values: t.List[t.Union[
+        # t.Optional[Decimal],
+        # t.Optional[pd.Timestamp],
+      #  t.Optional[str]],
+    #
+    #
     name: str
     type: str
-    values: t.List[t.Union[Decimal, pd.Timestamp, str]]
+    values: t.List[t.Optional[str]]
 
 
 class DuckDbQueryResponse(BaseModel):
