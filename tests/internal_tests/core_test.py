@@ -61,9 +61,13 @@ def test_execute_as_df(core_with_preloaded_table: CoreBusinessLogic) -> None:
     assert len(df) > 100
 
 
-def test_execute_as_df_with_meta_data(core_with_preloaded_table) -> None:
+def test_execute_as_df_with_meta_data(core_with_preloaded_table: CoreBusinessLogic) -> None:
     query = "select p.population, p.sample_size, p.sponsor_candidate, p.stage from president_polls_historical p"
-    df, df_meta = core_with_preloaded_table.execute_as_df_with_meta_data(query_str=query)
+    df, df_meta = core_with_preloaded_table.execute_as_df_with_meta_data(
+        query_str=query,
+        allow_blob_fallback=False,
+        fallback_tables=[],
+    )
 
     assert len(df) > 100
     assert "population" in df.columns
@@ -74,7 +78,11 @@ def test_map_to_duckdb_response(core_with_preloaded_table: CoreBusinessLogic) ->
     # NB: We assume this query works, and test mapping of this result. Testing of the query & meta data is tested
     #     elsewhere
     query = "select p.population, p.sample_size, p.sponsor_candidate, p.stage from president_polls_historical p"
-    df_data, df_metadata = core_with_preloaded_table.execute_as_df_with_meta_data(query_str=query)
+    df_data, df_metadata = core_with_preloaded_table.execute_as_df_with_meta_data(
+        query_str=query,
+        allow_blob_fallback=False,
+        fallback_tables=[],
+    )
 
     response: DuckDbQueryResponse = core_with_preloaded_table.map_response(df_data=df_data, df_metadata=df_metadata)
 
@@ -193,8 +201,7 @@ def test_import_remote_parquet_to_memory(core: CoreBusinessLogic):
         table_name=table_name,
     )
 
-    core.execute(query_str=f"DROP TABLE table_name")
-
+    core.execute(query_str=f"DROP TABLE {table_name}")
     # end region test setup
 
     test_query = f"select * from {table_name}"
@@ -211,3 +218,35 @@ def test_import_remote_parquet_to_memory(core: CoreBusinessLogic):
     df = core.execute_as_df(query_str=test_query)
 
     assert len(df) > 10
+
+
+def test_fallback_strategy(core: CoreBusinessLogic):
+    # begin region test setup
+    path = "./data/president_polls_historical.csv"
+    table_name: TableRef = f"automated_test_president_polls_historical_{random.randint(0, 1_000_000)}"
+
+    # this has the side-effect of writing to gcs, which is what we're testing below
+    _ = core.process_new_csv_file_to_gcs_parquet(
+        csv_path=path,
+        table_name=table_name,
+    )
+
+    core.execute(query_str=f"DROP TABLE {table_name}")
+
+
+    test_query = f"select * from {table_name}"
+    # we shouldn't be able to query the table
+    with pytest.raises(Exception):
+        # table has been dropped, we cannot query it, but its .parquet file is still in our blob bucket
+        _ = core.execute_as_df(query_str=test_query)
+
+    # end region test setup
+
+    df, df_meta = core.execute_as_df_with_meta_data(
+        query_str=test_query,
+        allow_blob_fallback=True,
+        fallback_tables=[table_name],
+    )
+
+    assert len(df) > 10
+    assert len(df_meta) > 1

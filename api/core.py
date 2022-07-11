@@ -109,13 +109,13 @@ class CoreBusinessLogic:
             if allow_blob_fallback is True:
                 for table_ref in fallback_tables:
                     # TODO: a likely worthwhile async optimization possible here! https://github.com/rob-sokolowski-git-org/api/issues/13
-                    self.import_remote_parquet_to_memory(parquet_key=f"{table_ref}.parquet")
+                    self.import_remote_parquet_to_memory(table_ref=table_ref)
 
-                # Call this function again, this time without allowing fallback
-                self.execute_as_df_with_meta_data(
-                    query_str=query_str,
-                    fallback_tables=[],
-                    allow_blob_fallback=False)
+                    # Call this function again, this time without allowing fallback
+                    return self.execute_as_df_with_meta_data(
+                        query_str=query_str,
+                        fallback_tables=[],
+                        allow_blob_fallback=False)
             else:
                 raise ex
 
