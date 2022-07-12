@@ -31,5 +31,6 @@ class EnvironmentConfig:
     bucket_name: str = _get_or_fail("BUCKET_NAME")
     google_application_credentials: str = _get_or_fail("GOOGLE_APPLICATION_CREDENTIALS")
     temp_dir: str = _get_or_fail("TEMP_DIR")
+    dev_magic_word: str = _get_or_fail("DEV_MAGIC_WORD")
 
 CONFIG = EnvironmentConfig()

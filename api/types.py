@@ -33,16 +33,8 @@ class TableRefGroup:
 # end region internal types
 
 
-class IncrementResponse(BaseModel):
-    value_was: int
-    value_is: int
-
-
-class PeakResponse(BaseModel):
-    value: int
-
-
 class Pong(BaseModel):
+    """used for dev-utilities, and healthchecks"""
     message: str = "PONG!"
 
 

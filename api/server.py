@@ -1,21 +1,17 @@
+import logging
 import random
 
-import pandas as pd
-import time
-import typing as t
-
-
-from fastapi import FastAPI, APIRouter, File, UploadFile, Form
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.models import Response
-
-
+import utils
 from api.core import CoreBusinessLogic
-from api.types import PeakResponse, IncrementResponse, DuckDbQueryRequest, DuckDbQueryResponse, Pong, TableRef, \
+from api.types import DuckDbQueryRequest, DuckDbQueryResponse, Pong, TableRef, \
     DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse
-from fastapi.responses import JSONResponse
-
 from env_config import CONFIG
+from fastapi import FastAPI, APIRouter, File, UploadFile, Form, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)s | %(message)s')
+
 
 core = CoreBusinessLogic(env_config=CONFIG)
 
@@ -81,6 +77,36 @@ def duckdb_router() -> APIRouter:
     return router
 
 
+def dev_utils_router() -> APIRouter:
+    router = APIRouter()
+
+    @router.post("/dev_utils/log_check")
+    async def log_test(req: Request) -> Pong:
+        """
+        verifies logging behavior on CloudRun, with cheap-o "auth", to protect against script kiddies
+        """
+        magic_word = req.headers.get("X-magic-word", "")
+        if not utils.check_magic_word(s=magic_word):
+            raise HTTPException(
+                status_code=401,
+                detail=f"ah ah ah, you didn't say the magic word!, ah ah ah"
+            )
+
+        logging.debug(f"debug statement")
+        logging.info(f"info statement")
+        logging.warning(f"warning statement")
+        logging.error(f"error statement")
+        try:
+            raise Exception("catch me")
+        except Exception as ex:
+            logging.exception(ex)
+        logging.critical(f"critical statement")
+
+        return Pong(message="logs written, check logs to verify")
+
+    return router
+
+
 def import_csv_files() -> None:
     """The following are loaded into DuckDB's memory"""
     core.import_csv_file(path="./data/president_polls.csv", table_ref="president_polls", )
@@ -100,6 +126,7 @@ def get_app_instance() -> FastAPI:
 
     app.include_router(health_check_router())
     app.include_router(duckdb_router())
+    app.include_router(dev_utils_router())
 
     return app
 

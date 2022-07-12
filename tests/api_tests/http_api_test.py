@@ -2,6 +2,7 @@ import random
 import pytest
 import shutil
 
+import utils
 from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse, \
     DuckDbQueryRequest, DuckDbQueryResponse
 from fastapi.testclient import TestClient
@@ -144,3 +145,22 @@ def test_dubckdb_query(client: TestClient):
     # deserialize to expected response type
     resp = DuckDbQueryResponse(**r.json())
     assert len(resp.columns) > 0
+
+
+def test_dev_util_log_check(client: TestClient):
+    url = f"{TARGET_HOST}/dev_utils/log_check"
+
+    r1 = client.post(
+        url,
+        headers={"X-magic-word":""},
+    )
+    # verify we are denied without magic word
+    assert r1.status_code == 401
+
+    r2 = client.post(
+        url,
+        headers={"X-magic-word": utils.read_magic_word()},
+    )
+
+    assert r2.ok
+    # But verifying logs is a manual step, go check!
