@@ -11,8 +11,8 @@ TEST_TEMP_DIR = "./tests/temp"
 
 # TODO: When I do the CloudBuild work these should be set via env files
 # TARGET_HOST = "http://localhost:8000"  # local dev
-TARGET_HOST = "http://host.docker.internal:8080"  # local gunicorn
-# TARGET_HOST = "https://api.robsoko.tech"  # production
+# TARGET_HOST = "http://host.docker.internal:8080"  # local gunicorn
+TARGET_HOST = "https://api.robsoko.tech"  # production
 
 
 @pytest.fixture(scope="module")
@@ -78,7 +78,7 @@ def test_upload_csv_to_duckdb_server(client: TestClient):
 
 
 def test_table_ref_endpoints(client: TestClient):
-    # beg region setup
+    # begin region setup
     url = f"{TARGET_HOST}/duckdb/files"
     original_path = "./data/president_polls.csv"
     table_ref = f"automated_test_president_polls_{random.randint(0, 1_000_000)}"

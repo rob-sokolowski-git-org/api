@@ -4,7 +4,8 @@ import numpy as np
 import random
 import typing as t
 
-from api.types import DuckDbQueryResponse, Column, TableRef, TableRefGroup
+from api.types import DuckDbQueryResponse, BaseColumn, TableRef, TableRefGroup, VarcharColumn, IntegerColumn, \
+    DefaultColumn
 from env_config import EnvironmentConfig
 from api import object_storage as obj
 
@@ -44,11 +45,21 @@ class CoreBusinessLogic:
         data_dict = df_data.to_dict(orient="list")
         metadata_records = df_metadata.to_dict(orient="records")
 
-        columns = [Column(
-                    name=record["column_name"],
-                    type=record["column_type"],
-                    values=data_dict[record["column_name"]]
-                ) for record in metadata_records]
+        columns: t.List[BaseColumn] = []
+        for record in metadata_records:
+            match record["column_type"]:
+                case "VARCHAR":
+                    clazz = VarcharColumn
+                case "INTEGER":
+                    clazz = IntegerColumn
+                case _:
+                    clazz = DefaultColumn
+
+            columns.append(clazz(
+                        name=record["column_name"],
+                        type=record["column_type"],
+                        values=data_dict[record["column_name"]],
+                    ))
 
         return DuckDbQueryResponse(columns=columns)
 
