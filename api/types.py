@@ -44,26 +44,26 @@ class DuckDbQueryRequest(BaseModel):
     allow_blob_fallback: bool
 
 
-class BaseColumn(BaseModel):
+class DefaultColumn(BaseModel):
     name: str
     type: str
-    values: t.List
+    values: t.List[t.Union[
+        t.Optional[Decimal],
+        t.Optional[pd.Timestamp],
+        t.Optional[str]],
+    ]
 
 
-class VarcharColumn(BaseColumn):
+class VarcharColumn(DefaultColumn):
     values: t.List[t.Optional[str]]
 
 
-class DefaultColumn(BaseColumn):
-    values: t.List[t.Union[t.Optional[Decimal], t.Optional[str]]]
-
-
-class IntegerColumn(BaseColumn):
+class IntegerColumn(DefaultColumn):
     values: t.List[t.Optional[int]]
 
 
 class DuckDbQueryResponse(BaseModel):
-    columns: t.List[BaseColumn]
+    columns: t.List[DefaultColumn]
 
 
 class DuckDbProcessCsvFileResponse(BaseModel):
