@@ -33,7 +33,7 @@ steps:
 
   - name: 'gcr.io/cloud-builders/docker'
     id: Build dev image (used as base image for next step)
-    dir: './'
+    dir: '.'
     args: ['push' 'gcr.io/fir-sandbox-326008/robsoko-api:dev']
 
 options:
