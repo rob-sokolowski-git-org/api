@@ -31,6 +31,11 @@ steps:
     dir: '.cloudbuild'
     args: ['down']
 
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build dev image (used as base image for next step)
+    dir: './'
+    args: ['push' 'gcr.io/fir-sandbox-326008/robsoko-api:dev']
+
 options:
   pool:
     name: 'projects/fir-sandbox-326008/locations/us-east4/workerPools/pool-1'
