@@ -5,4 +5,5 @@ __pychache__/
 
 .private/
 tests/temp/
+tests/scratch_tests/
 temp/

@@ -44,27 +44,33 @@ class DuckDbQueryRequest(BaseModel):
     allow_blob_fallback: bool
 
 
-class Column(BaseModel):
-    # NB: Union type ordering matters!! Basic idea is work from specific to generic, unsure if this is a "good enough"
-    #     solution or not
-    #
-    # Counterpoint: Zip codes with leading zeros won't work with this solution
-    #               but custom typing in BaseModel might be manageable, when needed
-    #
-    #
-    #    values: t.List[t.Union[
-        # t.Optional[Decimal],
-        # t.Optional[pd.Timestamp],
-      #  t.Optional[str]],
-    #
-    #
+class DefaultColumn(BaseModel):
     name: str
     type: str
+    values: t.List[t.Union[
+        t.Optional[Decimal],
+        t.Optional[pd.Timestamp],
+        t.Optional[str]],
+    ]
+
+
+class VarcharColumn(DefaultColumn):
     values: t.List[t.Optional[str]]
 
 
+class IntegerColumn(DefaultColumn):
+    values: t.List[t.Optional[int]]
+
+
+class BooleanColumn(DefaultColumn):
+    values: t.List[t.Optional[bool]]
+
+
+class DoubleColumn(DefaultColumn):
+    values: t.List[t.Optional[float]]
+
 class DuckDbQueryResponse(BaseModel):
-    columns: t.List[Column]
+    columns: t.List[DefaultColumn]
 
 
 class DuckDbProcessCsvFileResponse(BaseModel):
