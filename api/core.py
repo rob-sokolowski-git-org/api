@@ -1,11 +1,13 @@
+
 import duckdb
 import pandas as pd
 import numpy as np
 import random
 import typing as t
 
+
 from api.types import DuckDbQueryResponse, DefaultColumn, TableRef, TableRefGroup, VarcharColumn, IntegerColumn, \
-    DefaultColumn
+    DefaultColumn, BooleanColumn, DoubleColumn
 from env_config import EnvironmentConfig
 from api import object_storage as obj
 
@@ -42,8 +44,20 @@ class CoreBusinessLogic:
 
     @staticmethod
     def map_response(df_data: pd.DataFrame, df_metadata: pd.DataFrame) -> DuckDbQueryResponse:
+        # HACK: It appears that DuckDB's CSV importing with nullable boolean columns imputes empty strings instead of
+        #       None's. This must happen first thing in this method
+        #       https://github.com/rob-sokolowski-git-org/api/issues/30
+        #
+        # Filter on all non-varchar columns, mutate "" to Nones on those columns in the df_data
+        df_booleans = df_metadata.loc[df_metadata["column_type"].isin(["BOOLEAN", "INTEGER", "DOUBLE"])]
+        boolean_cols = df_booleans["column_name"].unique()
+        for b_col in boolean_cols:
+            df_data[b_col].replace(to_replace="", value=None, inplace=True)
+
+
         data_dict = df_data.to_dict(orient="list")
         metadata_records = df_metadata.to_dict(orient="records")
+
 
         columns: t.List[DefaultColumn] = []
         for record in metadata_records:
@@ -52,6 +66,10 @@ class CoreBusinessLogic:
                     clazz = VarcharColumn
                 case "INTEGER":
                     clazz = IntegerColumn
+                case "BOOLEAN":
+                    clazz = BooleanColumn
+                case "DOUBLE":
+                    clazz = DoubleColumn
                 case _:
                     clazz = DefaultColumn
 
@@ -64,7 +82,7 @@ class CoreBusinessLogic:
         return DuckDbQueryResponse(columns=columns)
 
     def import_csv_file(self, path: str, table_ref: TableRef):
-        query_str = f"CREATE TABLE {table_ref} AS SELECT * FROM read_csv_auto('{path}', auto_detect=True, all_varchar=True);"
+        query_str = f"CREATE TABLE {table_ref} AS SELECT * FROM read_csv_auto('{path}', auto_detect=True, all_varchar=False);"
         self._con.execute(query=query_str)
 
     def execute(self, query_str: str):  # return type intentionally omitted, let DuckDB handle the duck typing

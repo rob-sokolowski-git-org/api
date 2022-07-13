@@ -62,6 +62,13 @@ class IntegerColumn(DefaultColumn):
     values: t.List[t.Optional[int]]
 
 
+class BooleanColumn(DefaultColumn):
+    values: t.List[t.Optional[bool]]
+
+
+class DoubleColumn(DefaultColumn):
+    values: t.List[t.Optional[float]]
+
 class DuckDbQueryResponse(BaseModel):
     columns: t.List[DefaultColumn]
 
