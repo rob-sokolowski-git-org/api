@@ -32,8 +32,7 @@ steps:
     args: ['down']
 
   - name: 'gcr.io/cloud-builders/docker'
-    id: Build dev image (used as base image for next step)
-    dir: '.'
+    id: Push up dev image - used as base image for deployment
     args: ['push' 'gcr.io/fir-sandbox-326008/robsoko-api:dev']
 
 options:
