@@ -16,7 +16,15 @@ steps:
 
   - name: 'docker/compose:1.29.2'
     dir: '.cloudbuild'
-    args: ['run', 'pytest']
+    args: ['run', 'pytest-internal-tests']
+
+  - name: 'docker/compose:1.29.2'
+    dir: '.cloudbuild'
+    args: ['up', '-d', 'api-gunicorn']
+
+  - name: 'docker/compose:1.29.2'
+    dir: '.cloudbuild'
+    args: ['run', 'pytest-http-tests']
 
   # clean up after ourselves
   - name: 'docker/compose:1.29.2'
