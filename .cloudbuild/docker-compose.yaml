@@ -4,25 +4,7 @@ services:
   pytest:
     image: gcr.io/fir-sandbox-326008/robsoko-api:dev
     env_file:
-      - .env
-
-  api-dev:
-    image: robsoko-api:dev
-    ports:
-      - 8000:8000
-    working_dir: /home/appuser/run
-    volumes:
-    - ./:/home/appuser/run
-    command: python run_api_dev.py
-    env_file:
-      - .env
-
-  api-gunicorn:
-    image: robsoko-api:latest
-    ports:
-      - 8080:8080
-    env_file:
-      - .env
+      - ci.env
 
 networks:
   api-ci-network:
