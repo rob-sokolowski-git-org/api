@@ -39,4 +39,4 @@ options:
 availableSecrets:
   secretManager:
     - env: "MAGIC_WORD_SECRETS_KEY"
-      versionName: projects/fir-sandbox-326008/secrets/production-magic-word/versions/1
+      versionName: projects/fir-sandbox-326008/secrets/ci-magic-word/versions/1
