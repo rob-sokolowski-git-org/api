@@ -1,8 +1,8 @@
 import logging
 import random
 
-import utils
 from api.core import CoreBusinessLogic
+from api.secrets_utils import SECRETS
 from api.types import DuckDbQueryRequest, DuckDbQueryResponse, Pong, TableRef, \
     DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse
 from env_config import CONFIG
@@ -86,7 +86,7 @@ def dev_utils_router() -> APIRouter:
         verifies logging behavior on CloudRun, with cheap-o "auth", to protect against script kiddies
         """
         magic_word = req.headers.get("X-magic-word", "")
-        if not utils.check_magic_word(s=magic_word):
+        if magic_word != SECRETS.fetch_secret(key=CONFIG.magic_word_secrets_key):
             raise HTTPException(
                 status_code=401,
                 detail=f"ah ah ah, you didn't say the magic word!, ah ah ah"

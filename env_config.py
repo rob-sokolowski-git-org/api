@@ -28,9 +28,12 @@ class EnvironmentConfig:
      * all env variables must be set, otherwise fail loudly
     """
     env_name: str = _get_or_fail("ENV_NAME")
+    gcp_project_id: str = _get_or_fail("GCP_PROJECT_ID")
     bucket_name: str = _get_or_fail("BUCKET_NAME")
-    google_application_credentials: str = _get_or_fail("GOOGLE_APPLICATION_CREDENTIALS")
     temp_dir: str = _get_or_fail("TEMP_DIR")
-    dev_magic_word: str = _get_or_fail("DEV_MAGIC_WORD")
+    magic_word_secrets_key: str = _get_or_fail("MAGIC_WORD_SECRETS_KEY")
+    google_application_credentials: str = _get_or_fail("GOOGLE_APPLICATION_CREDENTIALS")
+    test_secret_secrets_key: str = _get_or_fail("TEST_SECRET_SECRETS_KEY")
+
 
 CONFIG = EnvironmentConfig()

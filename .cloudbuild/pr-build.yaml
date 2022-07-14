@@ -1,0 +1,36 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build dev image (used as base image for next step)
+    dir: './'
+    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:dev', '--file', 'Dockerfile-Dev', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build CI image
+    dir: './'
+    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:ci', '--file', '.cloudbuild/Dockerfile-Ci', '.']
+
+  # pre-emptive cleanup, in case previous run failed etc
+  - name: 'docker/compose:1.29.2'
+    dir: '.cloudbuild'
+    args: ['down']
+
+  - name: 'docker/compose:1.29.2'
+    dir: '.cloudbuild'
+    args: ['run', 'pytest-internal-tests']
+
+  - name: 'docker/compose:1.29.2'
+    dir: '.cloudbuild'
+    args: ['up', '-d', 'api-gunicorn']
+
+  - name: 'docker/compose:1.29.2'
+    dir: '.cloudbuild'
+    args: ['run', 'pytest-http-tests']
+
+  # clean up after ourselves
+  - name: 'docker/compose:1.29.2'
+    dir: '.cloudbuild'
+    args: ['down']
+
+options:
+  pool:
+    name: 'projects/fir-sandbox-326008/locations/us-east4/workerPools/pool-1'

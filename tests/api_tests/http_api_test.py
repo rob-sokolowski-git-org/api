@@ -2,10 +2,12 @@ import random
 import pytest
 import shutil
 
-import utils
+from api.secrets_utils import SECRETS
 from api.types import Pong, DuckDbProcessCsvFileResponse, DuckDbTableRefsResponse, DuckDbTableRefGroupResponse, \
     DuckDbQueryRequest, DuckDbQueryResponse
 from fastapi.testclient import TestClient
+
+from env_config import CONFIG
 
 TEST_TEMP_DIR = "./tests/temp"
 
@@ -147,7 +149,7 @@ def test_dubckdb_query(client: TestClient):
     assert len(resp.columns) > 0
 
 
-def test_dev_util_log_check(client: TestClient):
+def test_dev_utils_magic_word(client: TestClient):
     url = f"{TARGET_HOST}/dev_utils/log_check"
 
     r1 = client.post(
@@ -159,8 +161,21 @@ def test_dev_util_log_check(client: TestClient):
 
     r2 = client.post(
         url,
-        headers={"X-magic-word": utils.read_magic_word()},
+        headers={"X-magic-word": SECRETS.fetch_secret(key=CONFIG.magic_word_secrets_key)},
     )
 
+    # verify we get 200 with magic word passed in
     assert r2.ok
+
+
+
+def test_dev_util_log_check(client: TestClient):
+    url = f"{TARGET_HOST}/dev_utils/log_check"
+
+    r = client.post(
+        url,
+        headers={"X-magic-word": SECRETS.fetch_secret(key=CONFIG.magic_word_secrets_key)},
+    )
+
+    assert r.ok
     # But verifying logs is a manual step, go check!
