@@ -17,6 +17,7 @@ steps:
   - name: 'docker/compose:1.29.2'
     dir: '.cloudbuild'
     args: ['run', 'pytest-internal-tests']
+    secretEnv: ['MAGIC_WORD_SECRETS_KEY']
 
   - name: 'docker/compose:1.29.2'
     dir: '.cloudbuild'
