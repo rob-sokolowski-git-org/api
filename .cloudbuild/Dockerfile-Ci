@@ -13,4 +13,8 @@ USER root
 COPY --from=0 --chown=appuser:appuser /home/appuser /home/appuser
 USER appuser
 
+# temp/ directories are .dockerignored to keep image size slim, so we manually created them here
+RUN mkdir /home/appuser/temp
+RUN mkdir /home/appuser/tests/temp
+
 # cmd omitted intentionally

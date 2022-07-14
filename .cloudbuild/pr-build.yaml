@@ -4,6 +4,10 @@ steps:
     dir: './'
     args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:dev', '--file', 'Dockerfile-Dev', '.']
 
+  - id: Pull down service account creds file
+    name: 'gcr.io/cloud-builders/gsutil'
+    args: [ 'cp', 'gs://rob-soko-api-maintenance/service-runner-ci-creds.json', './.private/service-runner-ci-creds.json' ]
+
   - name: 'gcr.io/cloud-builders/docker'
     id: Build CI image
     dir: './'
@@ -26,7 +30,7 @@ steps:
     dir: '.cloudbuild'
     args: ['run', 'pytest-http-tests']
 
-  # clean up after ourselves
+  # clean up after ourselves, this is since we detached from docker-compose above
   - name: 'docker/compose:1.29.2'
     dir: '.cloudbuild'
     args: ['down']
