@@ -5,7 +5,7 @@ import numpy as np
 import random
 import typing as t
 
-
+from api.object_storage import BlobStorage
 from api.types import DuckDbQueryResponse, DefaultColumn, TableRef, TableRefGroup, VarcharColumn, IntegerColumn, \
     DefaultColumn, BooleanColumn, DoubleColumn
 from env_config import EnvironmentConfig
@@ -14,7 +14,10 @@ from api import object_storage as obj
 
 
 class CoreBusinessLogic:
-    def __init__(self, env_config: EnvironmentConfig, blob_storage=obj):
+    def __init__(self,
+                 env_config: EnvironmentConfig,
+                 blob_storage: BlobStorage = BlobStorage()
+                 ):
         self._con: duckdb.DuckDBPyConnection = duckdb.connect(
             check_same_thread=False, # TODO: This might be a bad idea..
         )
