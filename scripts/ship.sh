@@ -18,7 +18,7 @@ gcloud run deploy robsoko-api \
     --set-env-vars "HTTP_TEST_TARGET_HOST=http://api.robsoko.tech" \
     --set-env-vars "TEMP_DIR=./temp" \
     --set-env-vars "MAGIC_WORD_SECRETS_KEY=projects/fir-sandbox-326008/secrets/production-magic-word/versions/1" \
-    --set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=.private/gcloud-runner-production-creds.json" \
+    --set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=.private/service-runner-production-creds.json" \
     --set-env-vars "TEST_SECRET_SECRETS_KEY=projects/fir-sandbox-326008/secrets/test-secret/versions/1" \
     --min-instances 0 \
     --max-instances 1
