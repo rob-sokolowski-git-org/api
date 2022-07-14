@@ -13,9 +13,11 @@ gcloud run deploy robsoko-api \
     --memory 2048Mi \
     --cpu 4 \
     --set-env-vars "ENV_NAME=production" \
+    --set-env-vars "GCP_PROJECT_ID=fir-sandbox-326008" \
     --set-env-vars "BUCKET_NAME=rob-soko-api-production" \
-    --set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=./.private/gcloud-runner-production-key.json" \
     --set-env-vars "TEMP_DIR=./temp" \
-    --set-env-vars "DEV_MAGIC_WORD=./.private/dev_magic_word" \
+    --set-env-vars "MAGIC_WORD_SECRETS_KEY=projects/fir-sandbox-326008/secrets/production-magic-word/versions/1" \
+    --set-env-vars "GOOGLE_APPLICATION_CREDENTIALS=.private/gcloud-runner-production-key.json" \
+    --set-env-vars "TEST_SECRET_SECRETS_KEY=projects/fir-sandbox-326008/secrets/test-secret/versions/1" \
     --min-instances 0 \
     --max-instances 1
