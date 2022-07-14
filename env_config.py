@@ -10,9 +10,7 @@ class EnvironmentConfigurationError(Exception):
 def _get_or_fail(variable_name: str) -> str:
     val = os.environ.get(variable_name)
     if val is None:
-        # I'm debating an exit(-1) here, but that might be too harsh
-        # raise EnvironmentConfigurationError(f"environment variable {variable_name} MUST be set to run application!")
-        pass
+        raise EnvironmentConfigurationError(f"environment variable {variable_name} MUST be set to run application!")
 
     return val
 
@@ -35,6 +33,7 @@ class EnvironmentConfig:
     magic_word_secrets_key: str = _get_or_fail("MAGIC_WORD_SECRETS_KEY")
     google_application_credentials: str = _get_or_fail("GOOGLE_APPLICATION_CREDENTIALS")
     test_secret_secrets_key: str = _get_or_fail("TEST_SECRET_SECRETS_KEY")
+    api_tests_target_host: str = _get_or_fail("HTTP_TEST_TARGET_HOST")
 
 
 CONFIG = EnvironmentConfig()
