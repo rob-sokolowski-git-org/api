@@ -7,7 +7,7 @@ COPY ./ /home/appuser
 
 # splitting this out into multi-stage build and using the COPY command in this manner somehow reduces final image size
 # source: https://garbers.co.za/2017/11/15/reduce-docker-image-size-chmod-chown/#:~:text=Traditionally%2C%20copying%20in%20large%20files,of%20the%20files%20being%20modified).
-FROM robsoko-api:dev
+FROM gcr.io/fir-sandbox-326008/robsoko-api:dev
 
 USER root
 COPY --from=0 --chown=appuser:appuser /home/appuser /home/appuser
