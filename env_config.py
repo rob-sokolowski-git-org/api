@@ -11,7 +11,8 @@ def _get_or_fail(variable_name: str) -> str:
     val = os.environ.get(variable_name)
     if val is None:
         # I'm debating an exit(-1) here, but that might be too harsh
-        raise EnvironmentConfigurationError(f"environment variable {variable_name} MUST be set to run application!")
+        # raise EnvironmentConfigurationError(f"environment variable {variable_name} MUST be set to run application!")
+        pass
 
     return val
 
