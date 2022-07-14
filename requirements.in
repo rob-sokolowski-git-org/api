@@ -2,9 +2,11 @@ aiohttp[speedups]
 dataclasses-json
 duckdb==0.3.4  # 0.4.0 is out, but introduces some breaking changes.
 fastapi
+google-cloud-secret-manager
 google-cloud-storage
 gunicorn
 pandas
+protobuf==3.19.4
 numpy
 pydantic
 python-multipart
