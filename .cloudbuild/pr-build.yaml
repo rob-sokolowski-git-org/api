@@ -4,14 +4,14 @@ steps:
     dir: './'
     args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:dev', '--file', 'Dockerfile-Dev', '.']
 
+  - id: Pull down service account creds file
+    name: 'gcr.io/cloud-builders/gsutil'
+    args: [ 'cp', 'gs://rob-soko-api-maintenance/service-runner-ci-creds.json', './.private/service-runner-ci-creds.json' ]
+
   - name: 'gcr.io/cloud-builders/docker'
     id: Build CI image
     dir: './'
     args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:ci', '--file', '.cloudbuild/Dockerfile-Ci', '.']
-
-  - id: Pull down service account creds file
-    name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', 'gs://rob-soko-api-maintenance/service-runner-ci-creds.json', './.private/service-runner-ci-creds.json']
 
   # pre-emptive cleanup, in case previous run failed etc
   - name: 'docker/compose:1.29.2'
@@ -21,13 +21,6 @@ steps:
   - name: 'docker/compose:1.29.2'
     dir: '.cloudbuild'
     args: ['run', 'pytest-internal-tests']
-    env:
-      - 'BUILD=$BUILD_ID'
-      - 'PROJECT_ID=$PROJECT_ID'
-      - 'PROJECT_NUMBER=$PROJECT_NUMBER'
-      - 'REV=$REVISION_ID'
-
-    secretEnv: ['MAGIC_WORD_SECRETS_KEY']
 
   - name: 'docker/compose:1.29.2'
     dir: '.cloudbuild'
@@ -46,7 +39,7 @@ options:
   pool:
     name: 'projects/fir-sandbox-326008/locations/us-east4/workerPools/pool-1'
 
-availableSecrets:
-  secretManager:
-    - env: "MAGIC_WORD_SECRETS_KEY"
-      versionName: projects/fir-sandbox-326008/secrets/ci-magic-word/versions/1
+#availableSecrets:
+#  secretManager:
+#    - env: "MAGIC_WORD_SECRETS_KEY"
+#      versionName: projects/fir-sandbox-326008/secrets/ci-magic-word/versions/1
