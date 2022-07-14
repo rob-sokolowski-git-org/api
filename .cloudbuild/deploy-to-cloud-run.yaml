@@ -21,13 +21,12 @@ steps:
     id: Deploy to Cloud Run
     entrypoint: gcloud
     args: [
-      'run',
-      'deploy',
-      'robsoko-api',
-      '--image',
-      'gcr.io/fir-sandbox-326008/robsoko-api:production-latest',
-      '--region',
-      'us-east4',
+      'run', 'deploy', 'robsoko-api',
+      '--image', 'gcr.io/fir-sandbox-326008/robsoko-api:production-latest',
+      '--platform', 'managed',
+      '--region', 'us-east4',
+      '--memory', '2048Mi',
+      '--cpu', '4',
       '--set-env-vars', 'ENV_NAME=production',
       '--set-env-vars', 'GCP_PROJECT_ID=fir-sandbox-326008',
       '--set-env-vars', 'BUCKET_NAME=rob-soko-api-production',
