@@ -19,5 +19,4 @@ class SecretsUtils:
         response: AccessSecretVersionResponse =  self._client.access_secret_version(name=key)
         return response.payload.data.decode('UTF-8')
 
-
 SECRETS = SecretsUtils()
