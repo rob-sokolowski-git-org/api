@@ -1,4 +1,4 @@
-FROM robsoko-api:dev
+FROM gcr.io/fir-sandbox-326008/robsoko-api:dev
 
 # Since the service writes to its own home directory, we must grant ownership of the data we're about to copy in
 # Mounting a drive during dev implicitly achieves this, which is why we only do this operation in the deployed version
@@ -7,10 +7,14 @@ COPY ./ /home/appuser
 
 # splitting this out into multi-stage build and using the COPY command in this manner somehow reduces final image size
 # source: https://garbers.co.za/2017/11/15/reduce-docker-image-size-chmod-chown/#:~:text=Traditionally%2C%20copying%20in%20large%20files,of%20the%20files%20being%20modified).
-FROM robsoko-api:dev
+FROM gcr.io/fir-sandbox-326008/robsoko-api:dev
 
 USER root
 COPY --from=0 --chown=appuser:appuser /home/appuser /home/appuser
 USER appuser
+
+# temp/ directories are .dockerignored to keep image size slim, so we manually created them here
+RUN mkdir /home/appuser/temp
+RUN mkdir /home/appuser/tests/temp
 
 CMD ["sh", "-c", "gunicorn --workers 1 --timeout 3600 --worker-class uvicorn.workers.UvicornWorker -b 0.0.0.0:8080 api.server:app"]
