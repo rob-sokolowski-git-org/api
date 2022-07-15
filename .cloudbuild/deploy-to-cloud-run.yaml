@@ -2,34 +2,34 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: Build dev image (used as base image for next step)
     dir: './'
-    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:dev', '--file', 'Dockerfile-Dev', '.']
+    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/fir-api:dev', '--file', 'Dockerfile-Dev', '.']
 
   - id: Pull down service account creds file
     name: 'gcr.io/cloud-builders/gsutil'
-    args: [ 'cp', 'gs://rob-soko-api-maintenance/service-runner-production-creds.json', './.private/service-runner-production-creds.json' ]
+    args: [ 'cp', 'gs://project-fir-api-maintenance/service-runner-production-creds.json', './.private/service-runner-production-creds.json' ]
 
   - name: 'gcr.io/cloud-builders/docker'
     id: Build production image
     dir: './'
-    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:production-latest', '--file', '.cloudbuild/Dockerfile-Production', '.']
+    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/fir-api:production-latest', '--file', '.cloudbuild/Dockerfile-Production', '.']
 
-  - name: 'gcr.io/cloud-builders/docker'
-    id: Push up to gcr
-    args: ['push', 'gcr.io/fir-sandbox-326008/robsoko-api:production-latest']
+  - id: Push up to GCR
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/fir-sandbox-326008/fir-api:production-latest']
 
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: Deploy to Cloud Run
+  - id: Deploy to Cloud Run
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args: [
-      'run', 'deploy', 'robsoko-api',
-      '--image', 'gcr.io/fir-sandbox-326008/robsoko-api:production-latest',
+      'run', 'deploy', 'fir-api',
+      '--image', 'gcr.io/fir-sandbox-326008/fir-api:production-latest',
       '--platform', 'managed',
       '--region', 'us-east4',
       '--memory', '2048Mi',
       '--cpu', '4',
       '--set-env-vars', 'ENV_NAME=production',
       '--set-env-vars', 'GCP_PROJECT_ID=fir-sandbox-326008',
-      '--set-env-vars', 'BUCKET_NAME=rob-soko-api-production',
+      '--set-env-vars', 'BUCKET_NAME=project-fir-api-production',
       '--set-env-vars', 'HTTP_TEST_TARGET_HOST=http://api.robsoko.tech',
       '--set-env-vars', 'TEMP_DIR=./temp',
       '--set-env-vars', 'MAGIC_WORD_SECRETS_KEY=projects/fir-sandbox-326008/secrets/production-magic-word/versions/1',

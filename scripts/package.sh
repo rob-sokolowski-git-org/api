@@ -1,6 +1,6 @@
 #!/bin/bash
 
 docker build \
-  -t robsoko-api:latest\
+  -t fir-api:latest\
   --file Dockerfile-Deployment \
   .
