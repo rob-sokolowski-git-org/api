@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   resolve-pip-deps:
-    image: robsoko-api:dev
+    image: fir-api:dev
     volumes:
       - ./:/home/appuser/workspace
     working_dir: /home/appuser/workspace
@@ -11,19 +11,19 @@ services:
     command: pip-compile -r ./requirements.in
 
   pycharm-dev:
-    image: robsoko-api:dev
+    image: fir-api:dev
     ports:
       - 8000:8000
     env_file:
       - local-dev.env
 
   pytest-dev:
-    image: robsoko-api:dev
+    image: fir-api:dev
     env_file:
       - local-dev.env
 
   upload-creds-to-bucket:
-    image: robsoko-api:dev
+    image: fir-api:dev
     working_dir: /home/appuser/run
     volumes:
     - ./:/home/appuser/run
@@ -32,7 +32,7 @@ services:
       - local-dev.env
 
   api-dev:
-    image: robsoko-api:dev
+    image: fir-api:dev
     ports:
       - 8000:8000
     working_dir: /home/appuser/run
@@ -43,7 +43,7 @@ services:
       - local-dev.env
 
   api-gunicorn:
-    image: robsoko-api:latest
+    image: fir-api:latest
     ports:
       - 8080:8080
     env_file:

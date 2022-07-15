@@ -1,6 +1,6 @@
 #!/bin/bash
 
 docker build \
-  -t robsoko-api:dev\
+  -t fir-api:dev\
   --file Dockerfile-Dev \
   .

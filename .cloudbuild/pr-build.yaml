@@ -2,7 +2,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: Build dev image (used as base image for next step)
     dir: './'
-    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:dev', '--file', 'Dockerfile-Dev', '.']
+    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/fir-api:dev', '--file', 'Dockerfile-Dev', '.']
 
   - id: Pull down service account creds file
     name: 'gcr.io/cloud-builders/gsutil'
@@ -11,7 +11,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: Build CI image
     dir: './'
-    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/robsoko-api:ci', '--file', '.cloudbuild/Dockerfile-Ci', '.']
+    args: ['build', '-t', 'gcr.io/fir-sandbox-326008/fir-api:ci', '--file', '.cloudbuild/Dockerfile-Ci', '.']
 
   # pre-emptive cleanup, in case previous run failed etc
   - name: 'docker/compose:1.29.2'
