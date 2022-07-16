@@ -1,3 +1,3 @@
 ### api
 
-powers [api.robsoko.tech](https://api.robsoko.tech/docs)
+powers [fir-api.robsoko.tech](https://fir-api.robsoko.tech/docs)
