@@ -8,7 +8,7 @@ powers [fir-api.robsoko.tech](https://fir-api.robsoko.tech/docs)
 
 ### local dev
 
-While some features will work without credentials, to fully run the app locally, you'll need a local service account credentials. Write to me if you with to run this code locally and I'll set you up.
+While some features will work without credentials, to fully run the app locally, you'll need a local service account credentials file. Write to me if you with to run this code locally and I'll set you up.
 
 While sitting in this directory, you may build the dev docker image:
 ```bash
