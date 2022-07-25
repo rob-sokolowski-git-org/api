@@ -6,7 +6,7 @@ steps:
 
   - id: Pull down service account creds file
     name: 'gcr.io/cloud-builders/gsutil'
-    args: [ 'cp', 'gs://rob-soko-api-maintenance/service-runner-ci-creds.json', './.private/service-runner-ci-creds.json' ]
+    args: [ 'cp', 'gs://project-fir-api-maintenance/service-runner-ci-creds.json', './.private/service-runner-ci-creds.json' ]
 
   - name: 'gcr.io/cloud-builders/docker'
     id: Build CI image
