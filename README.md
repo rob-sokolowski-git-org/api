@@ -8,6 +8,8 @@ powers [fir-api.robsoko.tech](https://fir-api.robsoko.tech/docs)
 
 ### local dev
 
+While some features will work without credentials, to fully run the app locally, you'll need a local service account credentials. Write to me if you with to run this code locally and I'll set you up.
+
 While sitting in this directory, you may build the dev docker image:
 ```bash
 ./scripts/build.sh
@@ -41,7 +43,7 @@ There are 3 environment
 ### Cloud Build & Secrets
 This service uses Google Secrets Manager to access private resources.
 
-The tests that run have dedicated resources (a CI scoped bucket, for example. This requires some environment variable wiring for CloudBuild, see `.cloudbuild/ci.env`
+The tests that run have dedicated resources (a CI scoped bucket, for example). This requires some environment variable wiring for CloudBuild, see `.cloudbuild/ci.env`
 
 The `GOOGLE_APPLICATION_CREDENTIALS` variable points to a file in the running container that supplies the credentials for the
 service account. There is a service account per environment.
