@@ -34,9 +34,9 @@ Deployments are triggered when cutting a new tag. The intention is to deploy on 
 
 ### environments
 There are 3 environment
- * `local-dev.env` - use for local development
+ * `local-dev.env` - used for local development
  * `.cloudbuild/ci.env` - used by CloudBuild in a dedicated CI env
- * production env is defined by the series of `--set-env-vars` flags in .cloudbuild/deploy-to-cloud-run.yaml`
+ * production env is defined by the series of `--set-env-vars` flags in `.cloudbuild/deploy-to-cloud-run.yaml`
 
 ### Cloud Build & Secrets
 This service uses Google Secrets Manager to access private resources.
