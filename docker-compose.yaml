@@ -42,13 +42,6 @@ services:
     env_file:
       - local-dev.env
 
-  api-gunicorn:
-    image: fir-api:latest
-    ports:
-      - 8080:8080
-    env_file:
-      - local-dev.env
-
 networks:
   api-network:
     driver: bridge
