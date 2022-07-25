@@ -3,6 +3,9 @@
 powers [fir-api.robsoko.tech](https://fir-api.robsoko.tech/docs)
 
 
+![img](./assets/fir.jpg)
+
+
 ### local dev
 
 While sitting in this directory, you may build the dev docker image:
