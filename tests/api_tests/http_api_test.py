@@ -16,10 +16,9 @@ TARGET_HOST = CONFIG.api_tests_target_host
 @pytest.fixture(scope="module")
 def client():
     """
-    This fixture is funky, but useful
+    This fixture is funky, but useful if you want to debug these tests and the API together in an IDE
 
-    If you wish to run these api tests and also debug the service in a debugger, set
-    TARGET_HOST to localhost. This will return a TestClient which mimcs the `request`
+    To do this, set TARGET_HOST to localhost. This will return a TestClient which mimics the `request`
     modules API, to communicate with an in-memory instance of the service.
 
     To run these tests against production, or a separate container already running locally, just

@@ -17,4 +17,5 @@ USER appuser
 RUN mkdir /home/appuser/temp
 RUN mkdir /home/appuser/tests/temp
 
+# I only want 1 worker, to reduce liklihood of DuckDB cache misses on the Cloud Run deployment
 CMD ["sh", "-c", "gunicorn --workers 1 --timeout 3600 --worker-class uvicorn.workers.UvicornWorker -b 0.0.0.0:8080 api.server:app"]

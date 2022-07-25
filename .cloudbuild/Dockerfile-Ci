@@ -17,4 +17,4 @@ USER appuser
 RUN mkdir /home/appuser/temp
 RUN mkdir /home/appuser/tests/temp
 
-# cmd omitted intentionally
+# cmd omitted intentionally, CloudBuild / docker-compose will run tests
