@@ -99,7 +99,7 @@ class CoreBusinessLogic:
 
     def import_remote_parquet_to_memory(self, table_ref: TableRef):
         parquet_key = f"{table_ref}.parquet"
-        temp_dest_path = f"{self._temp_dir}/{random.randint(0, 1_000_000)}.parquet"
+        temp_dest_path = f"{self._temp_dir}/{random.randint(0, 1_000_000_000)}.parquet"
 
         self.blob_storage.fetch_file(
             bucket_name=self.bucket_name,
@@ -133,7 +133,7 @@ class CoreBusinessLogic:
         """
 
         try:
-            view_name = f"tmp_view_{random.randint(0, 10_000)}"
+            view_name = f"tmp_view_{random.randint(0, 1_000_000_000)}"
             view_cmd = f"""
                 CREATE VIEW {view_name} as {query_str}
             """
